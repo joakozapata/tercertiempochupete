@@ -1,0 +1,61 @@
+<p-menubar [model]="items()" styleClass="store-menubar">
+
+  <ng-template #start>
+    <a routerLink="/" class="brand" aria-label="Tercer Tiempo, inicio">
+      <span class="brand-mark">3T</span>
+      <span class="brand-text">TERCER <b>TIEMPO</b></span>
+    </a>
+  </ng-template>
+
+  <ng-template #end>
+    <p-button
+  icon="pi pi-shopping-bag"
+  [text]="true"
+  routerLink="/carrito"
+  ariaLabel="Carrito"
+  styleClass="nav-cart"
+>
+</p-button>
+    <div class="nav-actions">
+      <p-button
+  icon="pi pi-shopping-bag"
+  [text]="true"
+  routerLink="/carrito"
+  ariaLabel="Carrito"
+  [badge]="cart.count() > 0 ? cart.count().toString() : ''"
+  badgeSeverity="success"
+  styleClass="nav-cart"
+/>
+  @if (cart.count() > 0) {
+    <span class="cart-badge">{{ cart.count() }}</span>
+  }
+
+      @if (auth.isAuthenticated()) {
+        <p-button
+          [label]="auth.user()?.nombre || 'Mi cuenta'"
+          icon="pi pi-user"
+          [text]="true"
+          routerLink="/perfil"
+          styleClass="nav-user"
+        />
+
+        <p-button
+          label="Salir"
+          icon="pi pi-sign-out"
+          severity="secondary"
+          [text]="true"
+          (onClick)="logout()"
+          styleClass="nav-logout"
+        />
+      } @else {
+        <p-button
+          label="Ingresar"
+          icon="pi pi-user"
+          routerLink="/login"
+          styleClass="btn-emerald"
+        />
+      }
+    </div>
+  </ng-template>
+
+</p-menubar>

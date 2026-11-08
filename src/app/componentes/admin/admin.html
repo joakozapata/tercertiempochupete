@@ -1,0 +1,91 @@
+<section class="admin-page">
+  <!-- Cabecera de la sección con título y el botón para agregar un nuevo producto -->
+  <div class="page-heading">
+    <div><span>GESTIÓN 3T</span><div>Panel administrativo.</div></div>
+    <p-button label="Nuevo producto" icon="pi pi-plus" (onClick)="newProduct()" />
+  </div>
+  
+  <!-- Tarjetas con métricas rápidas (cantidad de productos, usuarios y ventas registradas) -->
+  <div class="metrics">
+    <div><span>Productos</span><b>{{ products().length }}</b></div>
+    <div><span>Usuarios</span><b>{{ users().length }}</b></div>
+    <div><span>Ventas</span><b>{{ sales().length }}</b></div>
+  </div>
+
+  <!-- Pestañas (Tabs) de PrimeNG para alternar entre la gestión de Productos, Usuarios y Ventas -->
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">Productos</p-tab>
+      <p-tab value="1">Usuarios</p-tab>
+      <p-tab value="2">Ventas</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      
+      <!-- PESTAÑA 0: Tabla de administración de Productos -->
+      <p-tabpanel value="0">
+        <p-table [value]="products()" [loading]="loading()" [paginator]="true" [rows]="8" responsiveLayout="stack">
+          <ng-template #header><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></ng-template>
+          <ng-template #body let-product>
+            <tr>
+              <td><b>{{ product.nombre }}</b></td>
+              <td>{{ product.categoria || "—" }}</td>
+              <td>{{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}</td>
+              <td><p-tag [value]="(product.stock ?? 0).toString()" [severity]="(product.stock ?? 0) > 0 ? 'success' : 'danger'" /></td>
+              <td>
+                <div class="row-actions">
+                  <p-button icon="pi pi-pencil" [text]="true" [ariaLabel]="'Editar ' + product.nombre" (onClick)="edit(product)" />
+                  <p-button icon="pi pi-trash" severity="danger" [text]="true" [ariaLabel]="'Eliminar ' + product.nombre" (onClick)="remove(product)" />
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+      
+      <!-- PESTAÑA 1: Tabla con la lista de Usuarios registrados -->
+      <p-tabpanel value="1">
+        <p-table [value]="users()" [loading]="loading()" [paginator]="true" [rows]="8">
+          <ng-template #header><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></ng-template>
+          <ng-template #body let-user>
+            <tr>
+              <td>{{ user.nombre }}</td>
+              <td>{{ user.email }}</td>
+              <td><p-tag [value]="user.rol" [severity]="user.rol === 'admin' ? 'warn' : 'info'" /></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+      
+      <!-- PESTAÑA 2: Tabla con el historial general de Ventas -->
+      <p-tabpanel value="2">
+        <p-table [value]="sales()" [loading]="loading()" [paginator]="true" [rows]="8">
+          <ng-template #header><tr><th>Compra</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></ng-template>
+          <ng-template #body let-sale>
+            <tr>
+              <td>#{{ purchaseId(sale) }}</td>
+              <td>{{ sale.fecha | date:"dd/MM/yyyy HH:mm" }}</td>
+              <td>{{ sale.estado || "Confirmada" }}</td>
+              <td><b>{{ sale.total | currency:"ARS":"symbol-narrow":"1.0-0" }}</b></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</section>
+
+<!-- Diálogo (Modal) para crear o editar un producto -->
+<p-dialog [(visible)]="productDialog" [modal]="true" [draggable]="false" [style]="{ width: 'min(36rem, 94vw)' }">
+  <ng-template #header><div class="dialog-title">{{ editingId() ? "Editar producto" : "Nuevo producto" }}</div></ng-template>
+  <form class="product-form" [formGroup]="form" (ngSubmit)="save()">
+    <label for="admin-name">Nombre</label><input id="admin-name" pInputText formControlName="nombre" />
+    <label for="admin-description">Descripción</label><input id="admin-description" pInputText formControlName="descripcion" />
+    <div class="form-row">
+      <label for="admin-price">Precio<p-inputnumber inputId="admin-price" formControlName="precio" mode="currency" currency="ARS" locale="es-AR" /></label>
+      <label for="admin-stock">Stock<p-inputnumber inputId="admin-stock" formControlName="stock" [min]="0" /></label>
+    </div>
+    <label for="admin-category">Categoría</label><input id="admin-category" pInputText formControlName="categoria" />
+    <label for="admin-image">URL de imagen</label><input id="admin-image" pInputText formControlName="imagen" />
+    <p-button [label]="editingId() ? 'Guardar cambios' : 'Crear producto'" icon="pi pi-check" type="submit" [loading]="saving()" />
+  </form>
+</p-dialog>

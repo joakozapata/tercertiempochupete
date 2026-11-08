@@ -1,0 +1,41 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+
+  background: #080808;
+  color: #f5f5f5;
+
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+button,
+input,
+textarea,
+.p-component {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Tipografía deportiva */
+h1, h2, h3,
+.brand-text,
+.footer-brand-info b,
+.contact-copy h1,
+.contact-card-title,
+.hero-title,
+.section-heading > div,
+.catalog-heading > div > div {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+}

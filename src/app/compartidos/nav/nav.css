@@ -1,0 +1,171 @@
+:host {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 100;
+}
+
+/* Barra de navegación */
+:host ::ng-deep .store-menubar {
+  background: #18181b !important;
+  border: 1px solid #333336 !important;
+  border-top: 0 !important;
+  border-radius: 0 0 5px 5px !important;
+
+  min-height: 40px;
+  padding: 4px 8px !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #ffffff;
+}
+
+/* Logo */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.brand-mark {
+  width: 29px;
+  height: 29px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #31d09e;
+  color: #080808;
+
+  border-radius: 5px;
+
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.brand-text {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: -0.4px;
+  white-space: nowrap;
+}
+
+.brand-text b {
+  color: #31d09e;
+}
+
+/* Elementos del menú */
+:host ::ng-deep .store-menubar .p-menubar-root-list {
+  background: transparent !important;
+  gap: 4px;
+}
+
+:host ::ng-deep .store-menubar .p-menubar-item-content {
+  background: transparent !important;
+  border-radius: 5px;
+}
+
+:host ::ng-deep .store-menubar .p-menubar-item-link {
+  color: #eeeeee !important;
+  padding: 8px 10px !important;
+  font-size: 12px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+:host ::ng-deep .store-menubar .p-menubar-item-link:hover {
+  background: #29292d !important;
+  color: #31d09e !important;
+}
+
+/* Iconos */
+:host ::ng-deep .store-menubar .p-menuitem-icon {
+  color: #31d09e !important;
+  font-size: 12px;
+}
+
+/* Botones del extremo derecho */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:host ::ng-deep .btn-emerald {
+  background: #31d09e !important;
+  border: 1px solid #31d09e !important;
+  color: #080808 !important;
+
+  padding: 6px 12px !important;
+  border-radius: 5px !important;
+
+  font-size: 12px !important;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+:host ::ng-deep .btn-emerald:hover {
+  background: #25b989 !important;
+  border-color: #25b989 !important;
+}
+
+:host ::ng-deep .nav-user,
+:host ::ng-deep .nav-logout {
+  color: #eeeeee !important;
+  font-size: 12px !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  :host ::ng-deep .store-menubar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .brand-text {
+    font-size: 12px;
+  }
+
+  .nav-actions {
+    gap: 4px;
+  }
+}
+.brand-text {
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+:host ::ng-deep .store-menubar,
+:host ::ng-deep .store-menubar * {
+  font-family: 'Inter', sans-serif;
+}
+
+.brand-text {
+  font-family: 'Barlow Condensed', sans-serif !important;
+}
+:host ::ng-deep .nav-cart {
+  color: #eeeeee !important;
+}
+
+:host ::ng-deep .nav-cart:hover {
+  color: #31d09e !important;
+}
+
+:host ::ng-deep .nav-cart .p-badge {
+  background: #31d09e;
+  color: #080808;
+  font-weight: 800;
+  font-size: 10px;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+}

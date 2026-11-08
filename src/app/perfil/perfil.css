@@ -1,0 +1,43 @@
+/* ==========================================================================
+   ESTILOS DE LA PÁGINA DE PERFIL DE USUARIO
+   ================================================================---------- */
+
+.profile-page {
+  display: grid;
+  place-items: center;
+  min-height: 40rem;
+  padding: clamp(3rem, 7vw, 7rem);
+}
+
+/* Tarjeta contenedora del perfil */
+:host ::ng-deep .profile-card {
+  width: min(100%, 32rem);
+  border: 1px solid var(--surface-border);
+  text-align: center;
+}
+
+/* Avatar del usuario */
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 6rem;
+  height: 6rem;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
+  font: 900 2.5rem "Barlow Condensed", sans-serif;
+}
+
+.profile-name {
+  font: 900 2.5rem "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+}
+
+p {
+  color: var(--text-muted-color);
+}
+
+.profile-actions {
+  margin-top: 2rem;
+}

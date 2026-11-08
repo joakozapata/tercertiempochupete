@@ -1,0 +1,87 @@
+<section class="hero">
+
+  <img
+    class="hero-image"
+    src="https://images.unsplash.com/photo-1768696082264-44f14594ca2c?w=1800&h=1100&fit=crop&auto=format"
+    alt="Botines de fútbol sobre el césped"
+  />
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-copy">
+
+    <p-tag
+      value="TEMPORADA 2026"
+      severity="warn"
+      styleClass="hero-tag"
+    />
+
+    <h1 class="hero-title">
+      DOMINÁ
+      <br />
+      <span>EL CAMPO</span>
+    </h1>
+
+    <p>
+      Equipamiento seleccionado para quienes juegan cada partido como si
+      fuera una final.
+    </p>
+
+    <div class="hero-actions">
+
+      <p-button
+        label="Ver catálogo"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        routerLink="/productos"
+        styleClass="hero-primary"
+      />
+
+      <p-button
+        label="Conocer ofertas"
+        severity="secondary"
+        [outlined]="true"
+        routerLink="/ofertas"
+        styleClass="hero-secondary"
+      />
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="home-section">
+
+  <div class="section-heading">
+
+    <span>ENCONTRÁ TU EQUIPO</span>
+
+    <h2>TODO LO QUE NECESITÁS PARA JUGAR.</h2>
+
+  </div>
+
+  <div class="feature-grid">
+
+    @for (feature of features; track feature.title) {
+
+      <p-card styleClass="feature-card">
+
+        <i [class]="feature.icon"></i>
+
+        <h3 class="feature-title">
+          {{ feature.title }}
+        </h3>
+
+        <p>
+          {{ feature.description }}
+        </p>
+
+      </p-card>
+
+    }
+
+  </div>
+
+</section>

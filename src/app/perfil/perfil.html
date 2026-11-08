@@ -1,0 +1,11 @@
+<section class="profile-page">
+  <p-card styleClass="profile-card">
+    <div class="avatar">{{ auth.user()?.nombre?.charAt(0)?.toUpperCase() || "3T" }}</div>
+    <div class="profile-name">{{ auth.user()?.nombre }}</div>
+    <p>{{ auth.user()?.email }}</p>
+    <p-tag [value]="auth.user()?.rol === 'admin' ? 'ADMINISTRADOR' : 'CLIENTE'" [severity]="auth.user()?.rol === 'admin' ? 'warn' : 'info'" />
+    <div class="profile-actions">
+      <p-button label="Cerrar sesión" icon="pi pi-sign-out" severity="danger" [outlined]="true" (onClick)="logout()" />
+    </div>
+  </p-card>
+</section>

@@ -1,0 +1,90 @@
+<section class="contact-page">
+
+  <div class="contact-container">
+
+    <!-- Información de contacto -->
+    <div class="contact-copy">
+
+      <span class="contact-label">CONTACTO</span>
+
+      <h1>
+        HABLEMOS DE TU<br>
+        PRÓXIMO PARTIDO.
+      </h1>
+
+      <p class="contact-description">
+        Te ayudamos con talles, disponibilidad y seguimiento de compras.
+      </p>
+
+      <ul class="contact-info">
+
+        <li>
+          <i class="pi pi-envelope"></i>
+          <span>hola&#64;tercertiempo.com</span>
+        </li>
+
+        <li>
+          <i class="pi pi-clock"></i>
+          <span>Lunes a viernes, 9 a 18 h</span>
+        </li>
+
+      </ul>
+
+    </div>
+
+    <!-- Formulario -->
+    <p-card styleClass="contact-card">
+
+      <ng-template #title>
+        <span class="contact-card-title">ENVIANOS UN MENSAJE</span>
+      </ng-template>
+
+      <form [formGroup]="form" (ngSubmit)="send()">
+
+        <div class="form-group">
+          <label for="contact-name">Nombre</label>
+
+          <input
+            id="contact-name"
+            pInputText
+            type="text"
+            formControlName="nombre"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contact-email">Email</label>
+
+          <input
+            id="contact-email"
+            pInputText
+            type="email"
+            formControlName="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contact-message">Mensaje</label>
+
+          <textarea
+            id="contact-message"
+            pTextarea
+            rows="5"
+            formControlName="mensaje"
+          ></textarea>
+        </div>
+
+        <p-button
+          label="Enviar consulta"
+          icon="pi pi-send"
+          type="submit"
+          styleClass="contact-submit"
+        />
+
+      </form>
+
+    </p-card>
+
+  </div>
+
+</section>

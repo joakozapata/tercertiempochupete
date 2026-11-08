@@ -1,0 +1,125 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.footer {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #080808;
+  border-top: 1px solid #303033;
+
+  padding: 30px 4.5% 24px;
+
+  color: #ffffff;
+}
+
+/* Contenido principal */
+.footer-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+
+/* Marca */
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.footer-mark {
+  width: 34px;
+  height: 31px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #31d09e;
+  color: #080808;
+
+  border-radius: 6px;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.footer-brand-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.footer-brand-info b {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.footer-brand-info small {
+  color: #85858c;
+  font-size: 11px;
+}
+
+/* Enlaces */
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.footer-links a {
+  color: #85858c;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: #31d09e;
+}
+
+/* Copyright */
+.footer-bottom {
+  margin-top: 25px;
+}
+
+.footer-bottom small {
+  color: #85858c;
+  font-size: 11px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .footer {
+    padding: 25px 20px;
+  }
+
+  .footer-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  .footer-bottom {
+    margin-top: 22px;
+  }
+}
+.footer-brand-info b {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.footer-brand-info small,
+.footer-links a,
+.footer-bottom small {
+  font-family: 'Inter', sans-serif;
+}

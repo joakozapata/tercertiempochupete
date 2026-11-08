@@ -1,0 +1,122 @@
+/* ==========================================
+   ESTILOS DE LA VISTA DE FAVORITOS
+   ========================================== */
+.page {
+  padding: 1rem 0;
+}
+
+/* Cabecera de la página de favoritos */
+.page .page-heading {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 1rem;
+}
+
+.page .page-heading span {
+  color: #facc15; /* Amarillo destacado */
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.page .page-heading div {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin-top: 0.25rem;
+}
+
+.page .page-heading p {
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+
+/* Grid de tarjetas de favoritos */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Estilo para las tarjetas (p-card) */
+.favorites-grid p-card {
+  background-color: #121824 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.favorites-grid p-card:hover {
+  transform: translateY(-4px);
+  border-color: #2563eb; /* Azul principal al pasar el cursor */
+}
+
+/* Imagen del producto en la tarjeta */
+.favorites-grid p-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-bottom: 1px solid #1e293b;
+}
+
+/* Textos de la tarjeta (PrimeNG slots) */
+.favorites-grid .p-card-title {
+  color: #f8fafc !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  padding: 1rem 1rem 0.25rem 1rem !important;
+}
+
+.favorites-grid .p-card-subtitle {
+  color: #facc15 !important; /* El precio resalta en amarillo */
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  padding: 0 1rem 1rem 1rem !important;
+}
+
+.favorites-grid .p-card-footer {
+  padding: 0 1rem 1rem 1rem !important;
+}
+
+/* Acciones (Botones dentro de la tarjeta) */
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.actions .p-button {
+  flex: 1;
+}
+
+/* Estado vacío de favoritos */
+.empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  background: #121824;
+  border-radius: 16px;
+  border: 1px dashed #1e293b;
+  margin-top: 2rem;
+}
+
+.empty i {
+  font-size: 3.5rem;
+  color: #facc15; /* Icono de corazón en amarillo */
+  margin-bottom: 1rem;
+}
+
+.empty div {
+  font-size: 1.35rem;
+  font-weight: bold;
+  color: #f8fafc;
+  margin-bottom: 0.5rem;
+}
+
+.empty p {
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}

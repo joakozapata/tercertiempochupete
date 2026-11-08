@@ -1,0 +1,204 @@
+<section class="catalog-page">
+
+  <!-- Encabezado -->
+  <div class="catalog-heading">
+
+    <div class="catalog-title">
+      <span>CATÁLOGO 2026</span>
+      <h1>EQUIPATE PARA COMPETIR.</h1>
+    </div>
+
+    <!-- Buscador -->
+    <label class="search-box" for="product-search">
+
+      <i class="pi pi-search"></i>
+
+      <input
+        id="product-search"
+        pInputText
+        [formControl]="search"
+        placeholder="Buscar productos..."
+      />
+
+    </label>
+
+  </div>
+
+
+  <!-- Cargando productos -->
+  @if (loading()) {
+
+    <div class="loading-grid">
+
+      @for (item of placeholders; track item) {
+        <p-skeleton height="24rem" styleClass="product-skeleton" />
+      }
+
+    </div>
+
+  }
+
+  <!-- Productos disponibles -->
+  @else if (products().length) {
+
+    <div class="product-grid">
+
+      @for (product of products(); track product.id) {
+
+        <p-card styleClass="product-card">
+
+          <!-- Imagen -->
+          <ng-template #header>
+
+            <div class="product-media">
+
+              <img
+                [src]="imageFor(product)"
+                [alt]="product.nombre"
+              />
+
+              @if (product.stock === 0) {
+                <p-tag
+                  value="SIN STOCK"
+                  severity="danger"
+                />
+              }
+
+            </div>
+
+          </ng-template>
+
+          <!-- Información -->
+          <ng-template #title>
+            <span class="product-name">
+              {{ product.nombre }}
+            </span>
+          </ng-template>
+
+          <ng-template #subtitle>
+            <span class="product-category">
+              {{ product.categoria || "Equipamiento deportivo" }}
+            </span>
+          </ng-template>
+
+          <p class="description">
+            {{ product.descripcion || "Selección oficial Tercer Tiempo." }}
+          </p>
+
+          <div class="price">
+            {{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
+          </div>
+
+
+          <!-- Acciones -->
+          <div class="card-actions">
+  <p-button
+    label="Agregar"
+    icon="pi pi-shopping-bag"
+    [disabled]="product.stock === 0"
+    (onClick)="addToCart(product)"
+    styleClass="add-button"
+  />
+
+  <p-button
+    [icon]="isFavorite(product) ? 'pi pi-heart-fill' : 'pi pi-heart'"
+    severity="secondary"
+    [outlined]="true"
+    [ariaLabel]="'Favorito ' + product.nombre"
+    (onClick)="toggleFavorite(product)"
+    styleClass="favorite-button"
+  />
+
+  <p-button
+    icon="pi pi-eye"
+    severity="secondary"
+    [text]="true"
+    [ariaLabel]="'Ver ' + product.nombre"
+    (onClick)="open(product)"
+    styleClass="view-button"
+  />
+</div>
+
+        </p-card>
+
+      }
+
+    </div>
+
+  }
+
+  <!-- Sin resultados -->
+  @else {
+
+    <div class="empty-state">
+
+      <i class="pi pi-search"></i>
+
+      <h2>NO ENCONTRAMOS PRODUCTOS</h2>
+
+      <p>
+        Probá con otro nombre o revisá la conexión con la API.
+      </p>
+
+    </div>
+
+  }
+
+</section>
+
+
+<!-- Diálogo de detalles -->
+<p-dialog
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [style]="{ width: 'min(56rem, 94vw)' }"
+  [draggable]="false"
+  [dismissableMask]="true"
+  styleClass="product-dialog"
+>
+
+    <ng-template #header>
+
+      <div class="dialog-title">
+        {{ selected()!.nombre }}
+      </div>
+
+    </ng-template>
+  @if (selected()) {
+
+
+    <div class="product-detail">
+
+      <img
+        [src]="imageFor(selected()!)"
+        [alt]="selected()!.nombre"
+      />
+
+      <div class="product-detail-info">
+
+        <p-tag
+          [value]="selected()!.categoria || 'PRODUCTO'"
+        />
+
+        <p>
+          {{ selected()!.descripcion }}
+        </p>
+
+        <div class="detail-price">
+          {{ selected()!.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
+        </div>
+
+        <p-button
+          label="Agregar al carrito"
+          icon="pi pi-shopping-bag"
+          (onClick)="addToCart(selected()!)"
+          styleClass="add-button"
+        />
+
+      </div>
+
+    </div>
+
+  }
+
+</p-dialog>

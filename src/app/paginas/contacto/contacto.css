@@ -1,0 +1,255 @@
+:host {
+  display: block;
+  width: 100%;
+  background: #080808;
+}
+
+/* Sección general */
+.contact-page {
+  width: 100%;
+  min-height: 575px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 65px 30px;
+
+  background: #080808;
+}
+
+/* Contenedor de las dos columnas */
+.contact-container {
+  width: 100%;
+  max-width: 1184px;
+
+  display: grid;
+  grid-template-columns: 1.5fr 0.85fr;
+
+  align-items: center;
+  gap: 65px;
+}
+
+/* Información izquierda */
+.contact-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Etiqueta verde */
+.contact-label {
+  color: #31d09e;
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+
+  margin-bottom: 16px;
+}
+
+/* Título principal */
+.contact-copy h1 {
+  margin: 0;
+
+  color: #f5f5f5;
+
+  font-family: Impact, "Arial Narrow", sans-serif;
+  font-size: clamp(38px, 5.3vw, 70px);
+
+  font-weight: 900;
+  line-height: 0.99;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+}
+
+/* Descripción */
+.contact-description {
+  margin: 10px 0 24px;
+
+  color: #85858c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Datos de contacto */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contact-info li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  color: #85858c;
+  font-size: 12px;
+}
+
+.contact-info i {
+  color: #31d09e;
+  font-size: 12px;
+}
+
+/* Tarjeta del formulario */
+:host ::ng-deep .contact-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #18181b !important;
+  border: none !important;
+  border-radius: 11px !important;
+
+  color: #ffffff !important;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+:host ::ng-deep .contact-card .p-card-body {
+  padding: 16px !important;
+}
+
+:host ::ng-deep .contact-card .p-card-title {
+  margin-bottom: 15px !important;
+}
+
+.contact-card-title {
+  color: #f5f5f5;
+
+  font-family: Impact, "Arial Narrow", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+
+  text-transform: uppercase;
+}
+
+/* Formulario */
+.contact-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+/* Grupos */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.form-group label {
+  color: #f5f5f5;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Inputs y textarea */
+:host ::ng-deep .contact-card input,
+:host ::ng-deep .contact-card textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #09090b !important;
+  border: 1px solid #505057 !important;
+  border-radius: 6px !important;
+
+  color: #ffffff !important;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  padding: 9px 11px;
+
+  outline: none;
+  box-shadow: none !important;
+
+  transition: border-color 0.2s;
+}
+
+:host ::ng-deep .contact-card input {
+  height: 29px;
+}
+
+:host ::ng-deep .contact-card textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+:host ::ng-deep .contact-card input:focus,
+:host ::ng-deep .contact-card textarea:focus {
+  border-color: #31d09e !important;
+}
+
+/* Botón enviar */
+:host ::ng-deep .contact-submit {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+
+  background: #31d09e !important;
+  border: 1px solid #31d09e !important;
+  border-radius: 6px !important;
+
+  color: #080808 !important;
+
+  padding: 6px 12px !important;
+
+  font-size: 12px !important;
+  font-weight: 600;
+
+  transition: background 0.2s;
+}
+
+:host ::ng-deep .contact-submit:hover {
+  background: #25b989 !important;
+  border-color: #25b989 !important;
+}
+
+:host ::ng-deep .contact-submit .p-button-icon {
+  color: #080808 !important;
+  font-size: 11px;
+}
+
+/* Responsive */
+@media (max-width: 850px) {
+  .contact-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    max-width: 550px;
+  }
+
+  .contact-page {
+    padding: 55px 25px;
+  }
+
+  .contact-copy h1 {
+    font-size: clamp(42px, 9vw, 65px);
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-page {
+    padding: 45px 18px;
+  }
+
+  .contact-copy h1 {
+    font-size: 40px;
+  }
+
+  .contact-description {
+    font-size: 12px;
+  }
+
+  :host ::ng-deep .contact-card .p-card-body {
+    padding: 14px !important;
+  }
+}

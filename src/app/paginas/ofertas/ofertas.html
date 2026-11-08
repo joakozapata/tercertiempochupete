@@ -1,0 +1,21 @@
+<section class="page">
+  <div class="page-heading">
+    <span>BENEFICIOS 3T</span>
+    <div>Más juego. Mejores ventajas.</div>
+    <p>Promociones disponibles para miembros de Tercer Tiempo.</p>
+  </div>
+
+  <div class="offer-grid">
+    @for (offer of offers; track offer.title) {
+      <p-card>
+        <ng-template #header>
+          <div class="offer-index">{{ offer.index }}</div>
+        </ng-template>
+        <p-tag [value]="offer.tag" severity="warn" />
+        <div class="offer-title">{{ offer.title }}</div>
+        <p>{{ offer.copy }}</p>
+        <p-button label="Explorar productos" icon="pi pi-arrow-right" iconPos="right" [text]="true" routerLink="/productos" />
+      </p-card>
+    }
+  </div>
+</section>

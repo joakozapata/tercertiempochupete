@@ -1,0 +1,135 @@
+<section class="cart-page">
+
+  <div class="cart-heading">
+    <span>LISTO PARA EL PARTIDO</span>
+    <h1>Tu carrito.</h1>
+  </div>
+
+  @if (cart.items().length) {
+
+    <div class="cart-layout">
+
+      <div class="cart-list">
+
+        <div class="cart-list-header">
+          <span>{{ cart.count() }} {{ cart.count() === 1 ? 'producto' : 'productos' }}</span>
+
+          <button type="button" class="btn btn-danger" (click)="confirmClear()">
+            <i class="pi pi-trash"></i>
+            Vaciar carrito
+          </button>
+        </div>
+
+        @for (item of cart.items(); track item.id_producto) {
+
+          <article class="cart-item">
+
+            <div class="item-image">
+              <img [src]="image(item)" [alt]="name(item)" />
+            </div>
+
+            <div class="item-info">
+              <h3>{{ name(item) }}</h3>
+              <span class="item-unit">
+                {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }} c/u
+              </span>
+            </div>
+
+            <div class="stepper" role="group" [attr.aria-label]="'Cantidad de ' + name(item)">
+              <button
+                type="button"
+                class="stepper-btn"
+                [disabled]="item.cantidad <= 1"
+                (click)="decrease(item)"
+                aria-label="Disminuir cantidad"
+              >
+                <i class="pi pi-minus"></i>
+              </button>
+
+              <span class="stepper-value">{{ item.cantidad }}</span>
+
+              <button
+                type="button"
+                class="stepper-btn"
+                [disabled]="item.cantidad >= 99"
+                (click)="increase(item)"
+                aria-label="Aumentar cantidad"
+              >
+                <i class="pi pi-plus"></i>
+              </button>
+            </div>
+
+            <div class="item-subtotal">
+              {{ item.precio_unitario * item.cantidad | currency:"ARS":"symbol-narrow":"1.0-0" }}
+            </div>
+
+            <button
+              type="button"
+              class="remove-btn"
+              [attr.aria-label]="'Quitar ' + name(item)"
+              (click)="remove(item)"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+
+          </article>
+
+        }
+
+        <a routerLink="/productos" class="continue-link">
+          <i class="pi pi-arrow-left"></i> Seguir comprando
+        </a>
+
+      </div>
+
+      <aside class="cart-summary">
+
+        <h2>RESUMEN</h2>
+
+        <div class="summary-row">
+          <span>Productos ({{ cart.count() }})</span>
+          <span>{{ cart.total() | currency:"ARS":"symbol-narrow":"1.0-0" }}</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Envío</span>
+          <span class="free">Gratis</span>
+        </div>
+
+        <div class="summary-total">
+          <span>Total</span>
+          <strong>{{ cart.total() | currency:"ARS":"symbol-narrow":"1.0-0" }}</strong>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary btn-block"
+          [disabled]="checkingOut()"
+          (click)="checkout()"
+        >
+          <i class="pi" [class.pi-lock]="!checkingOut()" [class.pi-spinner]="checkingOut()" [class.pi-spin]="checkingOut()"></i>
+          Finalizar compra
+        </button>
+
+      </aside>
+
+    </div>
+
+  } @else {
+
+    <div class="cart-empty">
+      <i class="pi pi-shopping-bag"></i>
+      <h2>TU CARRITO ESTÁ VACÍO</h2>
+      <p>Explorá el catálogo y elegí tu próximo equipo.</p>
+
+      <a routerLink="/productos" class="btn btn-primary">
+        Ver productos
+        <i class="pi pi-arrow-right"></i>
+      </a>
+    </div>
+
+  }
+
+</section>
+
+<p-confirmdialog />

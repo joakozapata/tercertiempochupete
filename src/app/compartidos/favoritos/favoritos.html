@@ -1,0 +1,36 @@
+<section class="page">
+  <div class="page-heading">
+    <span>TU SELECCIÓN</span>
+    <div>Favoritos.</div>
+    <p>{{ favorites().length }} productos guardados</p>
+  </div>
+
+  @if (favorites().length) {
+    <div class="favorites-grid">
+      @for (product of favorites(); track product.id) {
+        <p-card>
+          <ng-template #header>
+            <img [src]="product.imagen || fallback" [alt]="product.nombre" />
+          </ng-template>
+          <ng-template #title>{{ product.nombre }}</ng-template>
+          <ng-template #subtitle>
+            {{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
+          </ng-template>
+          <ng-template #footer>
+            <div class="actions">
+              <p-button label="Agregar al carrito" icon="pi pi-shopping-bag" (onClick)="addToCart(product)" />
+              <p-button icon="pi pi-trash" severity="danger" [outlined]="true" [ariaLabel]="'Quitar ' + product.nombre" (onClick)="remove(product)" />
+            </div>
+          </ng-template>
+        </p-card>
+      }
+    </div>
+  } @else {
+    <div class="empty">
+      <i class="pi pi-heart"></i>
+      <div>Tu lista está esperando</div>
+      <p>Guardá productos para encontrarlos más rápido.</p>
+      <p-button label="Explorar catálogo" routerLink="/productos" />
+    </div>
+  }
+</section>

@@ -1,0 +1,96 @@
+/* ==========================================
+   ESTILOS DE LA VISTA DE MIS COMPRAS
+   ========================================== */
+.page {
+  padding: 1rem 0;
+}
+
+/* Cabecera de la página */
+.page .page-heading {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 1rem;
+}
+
+.page .page-heading span {
+  color: #facc15; /* Amarillo destacado */
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.page .page-heading div {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #f8fafc;
+  margin-top: 0.25rem;
+}
+
+.page .page-heading p {
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+
+/* Tarjeta contenedora de PrimeNG */
+p-card {
+  background-color: #121824 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  display: block;
+}
+
+/* Tabla de compras (PrimeNG p-table) */
+.p-datatable {
+  background-color: #121824 !important;
+  color: #f8fafc !important;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background-color: #182030 !important;
+  color: #f8fafc !important;
+  border-bottom: 1px solid #1e293b !important;
+  font-weight: 700;
+  padding: 1rem;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  background-color: #121824 !important;
+  color: #f8fafc !important;
+  border-bottom: 1px solid #1e293b !important;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background-color: #182030 !important; /* Destaca sutilmente la fila al pasar el cursor */
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border-bottom: 1px solid #1e293b;
+}
+
+/* Destacados en la tabla */
+.p-datatable b {
+  color: #f8fafc;
+}
+
+/* Personalización del botón de ver ticket */
+.p-button.p-button-text {
+  color: #2563eb !important; /* Azul principal para la acción de ticket */
+  font-weight: 600 !important;
+}
+
+.p-button.p-button-text:hover {
+  background-color: rgba(37, 99, 235, 0.1) !important;
+  color: #facc15 !important; /* Cambia a amarillo al pasar el mouse */
+}
+
+/* Mensaje cuando la tabla está vacía */
+.empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  font-weight: 500;
+}

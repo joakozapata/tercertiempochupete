@@ -1,0 +1,105 @@
+/* ==========================================================================
+   ESTILOS DE LA PÁGINA DE ADMINISTRACIÓN (ADMIN)
+   ================================================================---------- */
+
+.admin-page {
+  min-height: 44rem;
+  padding: clamp(2rem, 5vw, 5rem);
+}
+
+/* Cabecera del panel */
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.page-heading span {
+  color: var(--p-primary-color);
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+}
+
+.page-heading > div > div {
+  margin-top: .75rem;
+  font: 900 clamp(3rem, 6vw, 5rem)/.9 "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+}
+
+/* Tarjetas de métricas superiores */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.metrics > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--p-border-radius-lg);
+  background: var(--surface-card);
+  color: var(--text-muted-color);
+}
+
+.metrics b {
+  color: var(--p-primary-color);
+  font: 900 2rem "Barlow Condensed", sans-serif;
+}
+
+/* Acciones en las filas de las tablas */
+.row-actions {
+  display: flex;
+  gap: .25rem;
+}
+
+/* Diálogo / Modal */
+.dialog-title {
+  font: 800 1.5rem "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+}
+
+/* Formulario de productos en el diálogo */
+.product-form {
+  display: grid;
+  gap: .7rem;
+}
+
+.product-form > label, 
+.form-row label {
+  display: grid;
+  gap: .45rem;
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.product-form > input, 
+:host ::ng-deep .product-form .p-inputnumber, 
+:host ::ng-deep .product-form .p-button {
+  width: 100%;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Media Queries para diseño responsivo */
+@media (max-width: 650px) {
+  .metrics, 
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

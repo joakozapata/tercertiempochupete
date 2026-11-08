@@ -1,0 +1,54 @@
+<section class="page">
+  <!-- Cabecera de la sección con título y descripción -->
+  <div class="page-heading">
+    <span>HISTORIAL</span>
+    <div>Mis compras.</div>
+    <p>Consultá tus pedidos y descargá los tickets generados.</p>
+  </div>
+
+  <!-- Tarjeta contenedora de la tabla -->
+  <p-card>
+    <!-- Tabla de PrimeNG para listar las compras con paginación si hay más de 8 registros -->
+    <p-table [value]="purchases()" [loading]="loading()" [paginator]="purchases().length > 8" [rows]="8" responsiveLayout="stack">
+      
+      <!-- Cabecera de la tabla -->
+      <ng-template #header>
+        <tr>
+          <th>Compra</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Total</th>
+          <th>Ticket</th>
+        </tr>
+      </ng-template>
+
+      <!-- Cuerpo de la tabla: se repite por cada compra -->
+      <ng-template #body let-purchase>
+        <tr>
+          <!-- ID de la compra formateado -->
+          <td><b>#{{ purchaseId(purchase) }}</b></td>
+          <!-- Fecha formateada usando el DatePipe -->
+          <td>{{ purchase.fecha | date:"dd/MM/yyyy HH:mm" }}</td>
+          <!-- Etiqueta de estado de la compra (por defecto "Confirmada") -->
+          <td><p-tag [value]="purchase.estado || 'Confirmada'" severity="success" /></td>
+          <!-- Total de la compra con formato de moneda ARS -->
+          <td><b>{{ purchase.total | currency:"ARS":"symbol-narrow":"1.0-0" }}</b></td>
+          <!-- Botón para ver o generar el PDF del ticket -->
+          <td>
+            <p-button label="Ver ticket" icon="pi pi-file-pdf" [text]="true" [loading]="ticketLoading() === purchaseId(purchase)" (onClick)="ticket(purchase)" />
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Mensaje cuando la lista de compras está vacía -->
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <div class="empty">Todavía no realizaste compras.</div>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </p-card>
+</section>
