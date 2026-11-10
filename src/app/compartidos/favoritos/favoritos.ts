@@ -4,8 +4,8 @@ import { RouterLink } from "@angular/router";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import { TagModule } from "primeng/tag";
-import { FavoritoService } from "../../servicios-favorito";
-import { CarritoService } from "../../servicios-carrito";
+import { FavoritoService } from "../../servicios/servicios-favorito";
+import { CarritoService } from "../../servicios/servicios-carrito";
 import { MessageService } from "primeng/api";
 import type { Producto } from "../../models/producto";
 
@@ -24,13 +24,19 @@ export class FavoritosComponent {
   readonly favorites = this.favoritesService.favorites;
   readonly fallback = "https://images.unsplash.com/photo-1515555230216-82228b88ea98?w=900&h=900&fit=crop&auto=format";
 
-  remove(product: Producto) {
-    this.favoritesService.remove(product);
-    this.messages.add({ severity: "info", summary: "Eliminado de favoritos", detail: product.nombre });
+ remove(product: Producto) {
+    this.favoritesService.remove(product).subscribe({
+      next: () => {
+        this.messages.add({ severity: "info", summary: "Eliminado de favoritos", detail: product.nombre });
+      }
+    });
   }
 
   addToCart(product: Producto) {
-    this.cart.add(product);
-    this.messages.add({ severity: "success", summary: "Añadido al carrito", detail: product.nombre });
+    this.cart.add(product).subscribe({
+      next: () => {
+        this.messages.add({ severity: "success", summary: "Añadido al carrito", detail: product.nombre });
+      }
+    });
   }
 }

@@ -1,24 +1,29 @@
 import { Component, inject, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import { TagModule } from "primeng/tag";
-import { AuthService } from "../core/auth-servicio"
+import { AuthService } from "../servicios/auth-servicio";
 
 @Component({
   selector: "app-perfil",
   standalone: true,
-  imports: [ButtonModule, CardModule, TagModule],
+  imports: [CommonModule, ButtonModule, CardModule, TagModule],
   templateUrl: "./perfil.html",
   styleUrl: "./perfil.css",
 })
 export class PerfilComponent implements OnInit {
-  readonly auth: AuthService = inject(AuthService);
-
+  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  ngOnInit() { 
-    this.auth.loadProfile(); 
+  ngOnInit() {
+    // Si loadProfile devuelve un observable hacia el backend, nos suscribimos:
+    this.auth.loadProfile().subscribe({
+      error: (err) => {
+        console.error("No se pudo cargar el perfil del usuario", err);
+      }
+    });
   }
 
   logout() { 

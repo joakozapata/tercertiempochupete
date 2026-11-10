@@ -3,13 +3,15 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { ButtonModule } from "primeng/button";
+import { CardModule } from "primeng/card";
 import type { ItemCarrito } from "../../models/producto";
-import { CarritoService } from "../../servicios-carrito";
+import { CarritoService } from "../../servicios/servicios-carrito";
 
 @Component({
   selector: "app-carrito",
   standalone: true,
-  imports: [CurrencyPipe, RouterLink, ConfirmDialogModule],
+  imports: [CurrencyPipe, RouterLink, ConfirmDialogModule, ButtonModule, CardModule],
   providers: [ConfirmationService],
   templateUrl: "./carrito.html",
   styleUrl: "./carrito.css",
@@ -25,7 +27,10 @@ export class CarritoComponent implements OnInit {
     "https://images.unsplash.com/photo-1515555230216-82228b88ea98?w=300&h=300&fit=crop&auto=format";
 
   ngOnInit() {
-    this.cart.load();
+    // Suscribirse a la carga del carrito desde la API
+    this.cart.load().subscribe({
+      error: (err) => console.error("Error al cargar carrito", err)
+    });
   }
 
   name(item: ItemCarrito) {
@@ -33,27 +38,45 @@ export class CarritoComponent implements OnInit {
   }
 
   image(item: ItemCarrito) {
-    return item.producto?.imagen || item.imagen || this.fallback;
+    const img = item.producto?.imagen || item.imagen;
+    if (!img) return this.fallback;
+    if (img.startsWith("http")) return img;
+    return `http://localhost/api-proyecto/uploads/${img}`;
   }
 
   increase(item: ItemCarrito) {
     if (item.cantidad < 99) {
-      this.cart.update(item, item.cantidad + 1);
+      this.cart.update(item, item.cantidad + 1).subscribe({
+        error: (err) => console.error("Error al actualizar cantidad", err)
+      });
     }
   }
 
   decrease(item: ItemCarrito) {
     if (item.cantidad > 1) {
-      this.cart.update(item, item.cantidad - 1);
+      this.cart.update(item, item.cantidad - 1).subscribe({
+        error: (err) => console.error("Error al actualizar cantidad", err)
+      });
     }
   }
 
   remove(item: ItemCarrito) {
-    this.cart.remove(item.id_producto);
-    this.messages.add({
-      severity: "success",
-      summary: "Producto eliminado",
-      detail: item.nombre || item.producto?.nombre,
+    this.cart.remove(item.id_producto).subscribe({
+      next: () => {
+        this.messages.add({
+          severity: "success",
+          summary: "Producto eliminado",
+          detail: item.nombre || item.producto?.nombre || "Producto quitado del carrito",
+        });
+      },
+      error: (err) => {
+        console.error("Error al eliminar item", err);
+        this.messages.add({
+          severity: "error",
+          summary: "Error",
+          detail: "No se pudo eliminar el producto del carrito.",
+        });
+      }
     });
   }
 
@@ -65,37 +88,30 @@ export class CarritoComponent implements OnInit {
       acceptButtonProps: { label: "Vaciar", severity: "danger" },
       rejectButtonProps: { label: "Cancelar", severity: "secondary", outlined: true },
       accept: () => {
-        this.cart.clear();
-        this.messages.add({
-          severity: "info",
-          summary: "Carrito vaciado",
-          detail: "Se eliminaron todos los productos.",
+        this.cart.clear().subscribe({
+          next: () => {
+            this.messages.add({
+              severity: "info",
+              summary: "Carrito vaciado",
+              detail: "Se eliminaron todos los productos.",
+            });
+          },
+          error: (err) => console.error("Error al vaciar carrito", err)
         });
       },
     });
   }
 
-  checkout() {
-    this.checkingOut.set(true);
-
-    try {
-      this.cart.clear();
-      this.checkingOut.set(false);
-
+  // Redirige al componente de Compra (Checkout) para ingresar datos de envío
+  proceedToCheckout() {
+    if (this.cart.items().length === 0) {
       this.messages.add({
-        severity: "success",
-        summary: "¡Compra exitosa!",
-        detail: "Tu pedido se ha procesado correctamente.",
+        severity: "warn",
+        summary: "Carrito vacío",
+        detail: "Agrega productos antes de finalizar la compra.",
       });
-
-      void this.router.navigate(["/productos"]);
-    } catch {
-      this.checkingOut.set(false);
-      this.messages.add({
-        severity: "error",
-        summary: "No pudimos finalizar",
-        detail: "Intentá nuevamente.",
-      });
+      return;
     }
+    void this.router.navigate(["/compra"]);
   }
 }

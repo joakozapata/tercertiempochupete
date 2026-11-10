@@ -6,7 +6,7 @@ import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import { InputTextModule } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
-import { AuthService } from "../../core/auth-servicio";
+import { AuthService } from "../../servicios/auth-servicio";
 
 @Component({
   selector: "app-inicio-sesion",
@@ -39,24 +39,26 @@ export class LoginComponent {
     
     this.loading.set(true);
 
-    // Llamada local directa sin .subscribe()
-    const exito = this.auth.login(this.form.getRawValue());
-    
-    this.loading.set(false);
-
-    if (exito) {
-      this.messages.add({ 
-        severity: "success", 
-        summary: "Bienvenido", 
-        detail: "Sesión iniciada correctamente." 
-      });
-      void this.router.navigate(["/productos"]);
-    } else {
-      this.messages.add({ 
-        severity: "error", 
-        summary: "No pudimos ingresar", 
-        detail: "Revisá tu correo y contraseña." 
-      });
-    }
+    // Llamada asíncrona real al AuthService conectado a la API y manejo de JWT
+    this.auth.login(this.form.getRawValue()).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.messages.add({ 
+          severity: "success", 
+          summary: "Bienvenido", 
+          detail: "Sesión iniciada correctamente." 
+        });
+        void this.router.navigate(["/productos"]);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        console.error("Error en login", err);
+        this.messages.add({ 
+          severity: "error", 
+          summary: "No pudimos ingresar", 
+          detail: err.error?.mensaje || "Credenciales incorrectas. Revisá tu correo y contraseña." 
+        });
+      }
+    });
   }
 }

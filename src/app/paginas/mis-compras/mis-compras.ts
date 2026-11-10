@@ -5,7 +5,7 @@ import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import { TableModule } from "primeng/table";
 import { TagModule } from "primeng/tag";
-import type { Compra, Ticket } from "../models/producto"; // Nota: ajustado a singular según tu modelo
+import type { Compra, Ticket } from "../../models/producto"; // Nota: ajustado a singular según tu modelo
 
 @Component({
   selector: "app-mis-compras",

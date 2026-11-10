@@ -8,27 +8,18 @@
   </ng-template>
 
   <ng-template #end>
-    <p-button
-  icon="pi pi-shopping-bag"
-  [text]="true"
-  routerLink="/carrito"
-  ariaLabel="Carrito"
-  styleClass="nav-cart"
->
-</p-button>
     <div class="nav-actions">
+
+      <!-- Carrito: siempre visible -->
       <p-button
-  icon="pi pi-shopping-bag"
-  [text]="true"
-  routerLink="/carrito"
-  ariaLabel="Carrito"
-  [badge]="cart.count() > 0 ? cart.count().toString() : ''"
-  badgeSeverity="success"
-  styleClass="nav-cart"
-/>
-  @if (cart.count() > 0) {
-    <span class="cart-badge">{{ cart.count() }}</span>
-  }
+        [icon]="cart.count() > 0 ? 'pi pi-shopping-bag' : 'pi pi-trash'"
+        [text]="true"
+        routerLink="/carrito"
+        [ariaLabel]="cart.count() > 0 ? 'Carrito con ' + cart.count() + ' productos' : 'Carrito vacío'"
+        [badge]="cart.count() > 0 ? cart.count().toString() : undefined"
+        badgeSeverity="success"
+        styleClass="nav-cart"
+      />
 
       @if (auth.isAuthenticated()) {
         <p-button
@@ -48,13 +39,18 @@
           styleClass="nav-logout"
         />
       } @else {
-        <p-button
-          label="Ingresar"
-          icon="pi pi-user"
-          routerLink="/login"
-          styleClass="btn-emerald"
-        />
+        <p-button 
+    label="Ingresar" 
+    icon="pi pi-sign-in" 
+    styleClass="p-button-outlined" 
+    routerLink="/inicio-sesion"
+    styleClass="nav-logout"
+
+
+    >
+  </p-button>
       }
+
     </div>
   </ng-template>
 

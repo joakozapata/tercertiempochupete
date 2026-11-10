@@ -169,3 +169,20 @@
   height: 16px;
   line-height: 16px;
 }
+:host ::ng-deep .nav-cart {
+  color: #eeeeee !important;
+}
+
+:host ::ng-deep .nav-cart:hover {
+  color: #31d09e !important;
+}
+
+:host ::ng-deep .nav-cart .p-badge {
+  background: #31d09e;
+  color: #080808;
+  font-weight: 800;
+  font-size: 10px;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+}

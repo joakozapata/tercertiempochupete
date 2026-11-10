@@ -3,8 +3,8 @@ import { Router, RouterLink } from "@angular/router";
 import { ButtonModule } from "primeng/button";
 import { BadgeModule } from "primeng/badge";
 import { MenubarModule } from "primeng/menubar";
-import { CarritoService } from "../../servicios-carrito";
-import { AuthService } from "../../core/auth-servicio";
+import { CarritoService } from "../../servicios/servicios-carrito";
+import { AuthService } from "../../servicios/auth-servicio";
 
 @Component({
   selector: "app-nav",

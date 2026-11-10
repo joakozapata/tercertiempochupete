@@ -1,5 +1,5 @@
 import { CurrencyPipe } from "@angular/common";
-import { Component, computed, inject, signal } from "@angular/core";
+import { Component, computed, inject, OnInit, signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -12,53 +12,40 @@ import { InputTextModule } from "primeng/inputtext";
 import { SkeletonModule } from "primeng/skeleton";
 import { TagModule } from "primeng/tag";
 import type { Producto } from "../../models/producto";
-import { AuthService } from "../../core/auth-servicio";
-import { CarritoService } from "../../servicios-carrito";
-import { FavoritoService } from "../../servicios-favorito";
+import { AuthService } from "../../servicios/auth-servicio";
+import { CarritoService } from "../../servicios/servicios-carrito";
+import { FavoritoService } from "../../servicios/servicios-favorito";
+import { ProductService } from "../../servicios/product-service";
 
 @Component({
   selector: "app-productos",
   standalone: true,
-  imports: [CurrencyPipe, ReactiveFormsModule, ButtonModule, CardModule, DialogModule, InputTextModule, SkeletonModule, TagModule],
+  imports: [
+    CurrencyPipe,
+    ReactiveFormsModule,
+    ButtonModule,
+    CardModule,
+    DialogModule,
+    InputTextModule,
+    SkeletonModule,
+    TagModule,
+  ],
   templateUrl: "./productos.html",
   styleUrl: "./productos.css",
 })
-export class ProductosComponent {
+export class ProductosComponent implements OnInit {
   readonly auth: AuthService = inject(AuthService);
   private readonly cart = inject(CarritoService);
   private readonly favorites = inject(FavoritoService);
+  private readonly productService = inject(ProductService);
   private readonly router = inject(Router);
   private readonly messages = inject(MessageService);
 
-  private readonly catalog = signal<Producto[]>([
-    {
-      id: 1,
-      nombre: "Camiseta Oficial Tercer Tiempo 2026",
-      descripcion: "Edición especial con detalles metalizados y tela respirable de alto rendimiento.",
-      precio: 45000,
-      imagen: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=900&h=900&fit=crop&auto=format",
-      stock: 12,
-      categoria: "Indumentaria",
-    },
-    {
-      id: 2,
-      nombre: "Short Deportivo Pro",
-      descripcion: "Diseñado para máxima movilidad dentro y fuera de la cancha.",
-      precio: 22000,
-      imagen: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=900&h=900&fit=crop&auto=format",
-      stock: 5,
-      categoria: "Indumentaria",
-    },
-    {
-      id: 3,
-      nombre: "Pelota de Fútbol 3T Match",
-      descripcion: "Costuras termoselladas y aprobación profesional FIFA Quality Pro.",
-      precio: 68000,
-      imagen: "https://images.unsplash.com/photo-1614632537456-e58f260492cb?w=900&h=900&fit=crop&auto=format",
-      stock: 0,
-      categoria: "Accesorios",
-    },
-  ]);
+  readonly catalog = signal<Producto[]>([]);
+  readonly loading = signal(true);
+  readonly selected = signal<Producto | null>(null);
+  readonly placeholders = [1, 2, 3, 4, 5, 6];
+  dialogVisible = false;
 
   readonly search = new FormControl("", { nonNullable: true });
 
@@ -66,6 +53,32 @@ export class ProductosComponent {
     this.search.valueChanges.pipe(debounceTime(250), distinctUntilChanged()),
     { initialValue: "" },
   );
+
+  ngOnInit() {
+    this.cargarProductos();
+    if (this.auth.isAuthenticated()) {
+      this.favorites.load().subscribe();
+    }
+  }
+
+  cargarProductos() {
+    this.loading.set(true);
+    this.productService.getProductos().subscribe({
+      next: (data) => {
+        this.catalog.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error("Error al cargar productos desde la API", err);
+        this.messages.add({
+          severity: "error",
+          summary: "Error de API",
+          detail: "No se pudieron obtener los productos de la tienda.",
+        });
+        this.loading.set(false);
+      },
+    });
+  }
 
   private normalize(text: string) {
     return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -79,13 +92,14 @@ export class ProductosComponent {
     );
   });
 
-  readonly selected = signal<Producto | null>(null);
-  readonly loading = signal(false);
-  readonly placeholders = [1, 2, 3, 4, 5, 6];
-  dialogVisible = false;
-
   imageFor(product: Producto) {
-    return product.imagen || "https://images.unsplash.com/photo-1515555230216-82228b88ea98?w=900&h=900&fit=crop&auto=format";
+    if (!product.imagen) {
+      return "https://images.unsplash.com/photo-1515555230216-82228b88ea98?w=900&h=900&fit=crop&auto=format";
+    }
+    if (product.imagen.startsWith("http")) {
+      return product.imagen;
+    }
+    return `http://localhost/api-proyecto/uploads/${product.imagen}`;
   }
 
   isFavorite(product: Producto) {
@@ -100,20 +114,38 @@ export class ProductosComponent {
 
   addToCart(product: Producto) {
     if (!this.requireSession()) return;
-    this.cart.add(product);
-    this.messages.add({ severity: "success", summary: "Añadido", detail: `${product.nombre} está en tu carrito.` });
+    this.cart.add(product).subscribe({
+      next: () => {
+        this.messages.add({
+          severity: "success",
+          summary: "Añadido",
+          detail: `${product.nombre} está en tu carrito.`,
+        });
+      },
+    });
   }
 
   toggleFavorite(product: Producto) {
     if (!this.requireSession()) return;
-    this.favorites.toggle(product);
-    this.messages.add({ severity: "success", summary: "Favoritos actualizados", detail: product.nombre });
+    this.favorites.toggle(product).subscribe({
+      next: () => {
+        this.messages.add({
+          severity: "success",
+          summary: "Favoritos",
+          detail: `Actualizado: ${product.nombre}`,
+        });
+      },
+    });
   }
 
   private requireSession() {
     if (this.auth.isAuthenticated()) return true;
-    this.messages.add({ severity: "info", summary: "Iniciá sesión", detail: "Necesitás una cuenta para continuar." });
-    void this.router.navigate(["/login"]);
+    this.messages.add({
+      severity: "info",
+      summary: "Iniciá sesión",
+      detail: "Necesitás una cuenta para continuar.",
+    });
+    void this.router.navigate(["/auth/inicio-sesion"]);
     return false;
   }
 }

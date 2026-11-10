@@ -6,7 +6,7 @@ import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import { InputTextModule } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
-import { AuthService } from "../../core/auth-servicio";
+import { AuthService } from "../../servicios/auth-servicio";
 
 @Component({
   selector: "app-registro",
@@ -42,24 +42,26 @@ export class RegistroComponent {
     this.loading.set(true);
     const { confirmar: _, ...payload } = this.form.getRawValue();
 
-    // Llamada local directa sin .subscribe() ya que el servicio devuelve booleano
-    const exito = this.auth.register(payload);
-    
-    this.loading.set(false);
-
-    if (exito) {
-      this.messages.add({ 
-        severity: "success", 
-        summary: "Cuenta creada", 
-        detail: "Ya podés iniciar sesión." 
-      });
-      void this.router.navigate(["/login"]);
-    } else {
-      this.messages.add({ 
-        severity: "error", 
-        summary: "No pudimos registrarte", 
-        detail: "Revisá los datos e intentá nuevamente." 
-      });
-    }
+    // Llamada asíncrona real al AuthService conectado a la API de PHP
+    this.auth.register(payload).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.messages.add({ 
+          severity: "success", 
+          summary: "Cuenta creada", 
+          detail: "Ya podés iniciar sesión." 
+        });
+        void this.router.navigate(["/auth/inicio-sesion"]); // Ajusta la ruta si es /login según tus rutas
+      },
+      error: (err) => {
+        this.loading.set(false);
+        console.error("Error en registro", err);
+        this.messages.add({ 
+          severity: "error", 
+          summary: "No pudimos registrarte", 
+          detail: err.error?.mensaje || "Revisá los datos o el correo electrónico ya está registrado." 
+        });
+      }
+    });
   }
 }
