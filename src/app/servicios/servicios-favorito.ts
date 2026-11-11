@@ -8,7 +8,7 @@ import type { Producto } from "../models/producto";
 })
 export class FavoritoService {
   private http = inject(HttpClient);
-  private apiUrl = "http://localhost/api-proyecto"; // Ajusta según tu backend PHP
+  private apiUrl = "http://localhost/api_proyecto/public"; // Ruta exacta a tu backend PHP
 
   readonly favorites = signal<Producto[]>([]);
 
@@ -36,7 +36,7 @@ export class FavoritoService {
     );
   }
 
-  // Alternar favorito (útil para el botón de la UI)
+  // Alternar favorito (ideal para el botón de la UI / catálogo)
   toggle(producto: Producto): Observable<any> {
     const id = producto.id_producto ?? producto.id;
     const current = this.favorites();

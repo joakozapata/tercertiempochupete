@@ -1,42 +1,48 @@
 import { Injectable, inject } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
-import type { Producto } from "../models/producto";
+import type { Producto } from "../models/producto"; // Asegúrate de que la ruta a la carpeta models sea correcta
 
 @Injectable({
   providedIn: "root",
 })
 export class ProductService {
   private http = inject(HttpClient);
-  private apiUrl = "http://localhost/api-proyecto"; // Ajusta según tu backend
+  private apiUrl = "http://localhost/api_proyecto/public/productos"; // Ajusta con la carpeta real de tu proyecto local
 
-  // Listar todos los productos
-  getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(`${this.apiUrl}/productos`);
+  // Listar todos o buscar por texto (ej: ?buscar=remera)
+  listar(buscar: string = ""): Observable<Producto[]> {
+    let params = new HttpParams();
+    if (buscar) {
+      params = params.set("buscar", buscar);
+    }
+    return this.http.get<Producto[]>(this.apiUrl, { params });
   }
 
   // Ver un producto por ID
-  getProducto(id: number): Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}/productos/${id}`);
+  verUno(id: number): Observable<Producto> {
+    return this.http.get<Producto>(`${this.apiUrl}/${id}`);
   }
 
   // Crear producto (admin)
-  crearProducto(producto: Partial<Producto>): Observable<any> {
-    return this.http.post(`${this.apiUrl}/productos`, producto);
+  crear(producto: Partial<Producto>): Observable<any> {
+    return this.http.post(this.apiUrl, producto);
   }
 
   // Editar producto (admin)
-  actualizarProducto(id: number, producto: Partial<Producto>): Observable<any> {
-    return this.http.put(`${this.apiUrl}/productos/${id}`, producto);
-  }
-
-  // Subir imagen de producto (admin)
-  subirImagen(formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/productos/imagen`, formData);
+  editar(id: number, producto: Partial<Producto>): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, producto);
   }
 
   // Eliminar producto (admin)
-  eliminarProducto(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/productos/${id}`);
+  eliminar(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  // Subir imagen de producto (admin)
+  subirImagen(archivo: File): Observable<{ imagen: string }> {
+    const datos = new FormData();
+    datos.append("imagen", archivo); // El nombre "imagen" debe coincidir con lo que lee PHP en $_FILES
+    return this.http.post<{ imagen: string }>(`${this.apiUrl}/imagen`, datos);
   }
 }

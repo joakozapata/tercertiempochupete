@@ -1,84 +1,161 @@
-/* ==========================================================================
-   ESTILOS DE LA PÁGINA DE INICIO DE SESIÓN / AUTENTICACIÓN
-   ================================================================---------- */
-
-.auth-page {
-  display: grid;
-  grid-template-columns: 1fr minmax(20rem, 30rem);
-  align-items: center;
-  gap: clamp(2rem, 8vw, 8rem);
-  min-height: 44rem;
-  padding: clamp(2rem, 7vw, 7rem);
-  background: radial-gradient(circle at 18% 35%, color-mix(in srgb, var(--p-primary-color) 18%, transparent), transparent 34%);
+.auth-container {
+  display: flex;
+  min-height: calc(100vh - 70px);
+  background-color: #0b0b0b;
+  color: #ffffff;
 }
 
-.auth-copy {
-  max-width: 42rem;
+.auth-banner {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(15, 23, 42, 0.95)), 
+              url('https://images.unsplash.com/photo-1517649763962-0c623266cfd0?w=1200&fit=crop') center/cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.eyebrow {
-  color: var(--p-primary-color);
+.badge-tag {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.auth-banner h1 {
+  font-size: 3.2rem;
   font-weight: 800;
-  letter-spacing: .18em;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -1px;
 }
 
-.display-title {
-  margin: 1rem 0;
-  font: 900 clamp(3rem, 7vw, 6rem)/.9 "Barlow Condensed", sans-serif;
-  text-transform: uppercase;
+.auth-banner p {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  max-width: 450px;
 }
 
-.auth-copy p, 
-.switch-copy {
-  color: var(--text-muted-color);
-  line-height: 1.7;
+.auth-form-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #121212;
 }
 
-/* Tarjeta contenedora del formulario */
-:host ::ng-deep .auth-card {
-  border: 1px solid var(--surface-border);
-  background: color-mix(in srgb, var(--surface-card) 94%, transparent);
-  box-shadow: var(--p-overlay-popover-shadow);
+/* Tarjeta y componentes PrimeNG */
+::ng-deep .auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #18181b !important;
+  border: 1px solid #27272a !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  color: #ffffff !important;
 }
 
-/* Estilos generales del formulario */
-form {
-  display: grid;
-  gap: .75rem;
+::ng-deep .auth-card .p-card-body {
+  padding: 2.5rem !important;
 }
 
-label {
-  margin-top: .5rem;
-  font-size: .8rem;
+.auth-header h2 {
+  font-size: 1.75rem;
   font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
 }
 
-input, 
-:host ::ng-deep .p-password, 
-:host ::ng-deep .p-password-input, 
-:host ::ng-deep .p-button {
+.auth-header p {
+  color: #a1a1aa;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.auth-form .field {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #e4e4e7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+::ng-deep .auth-form .p-inputtext {
+  background-color: #27272a !important;
+  border: 1px solid #3f3f46 !important;
+  color: #ffffff !important;
+  padding: 0.85rem 1rem !important;
+  border-radius: 8px !important;
   width: 100%;
 }
 
-.field-error {
-  color: var(--p-red-400);
+::ng-deep .auth-form .p-inputtext:focus {
+  border-color: #22c55e !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
 }
 
-/* Pie del formulario (cambiar a registro, etc.) */
-.switch-copy {
-  margin: .75rem 0 0;
+.form-actions {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+::ng-deep .p-button-success {
+  background-color: #22c55e !important;
+  border-color: #22c55e !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  padding: 0.85rem !important;
+  border-radius: 8px !important;
+  width: 100%;
+}
+
+::ng-deep .p-button-success:hover {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+}
+
+.auth-footer {
   text-align: center;
-  font-size: .85rem;
+  font-size: 0.9rem;
+  color: #a1a1aa;
 }
 
-.switch-copy a {
-  color: var(--p-primary-color);
-  font-weight: 700;
+.auth-link {
+  color: #22c55e;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 0.35rem;
 }
 
-/* Media Query para pantallas pequeñas */
-@media (max-width: 800px) {
-  .auth-page {
-    grid-template-columns: 1fr;
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsividad para celulares y tablets */
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+  }
+  .auth-banner {
+    padding: 2.5rem 1.5rem;
+    min-height: auto;
+  }
+  .auth-banner h1 {
+    font-size: 2.25rem;
   }
 }

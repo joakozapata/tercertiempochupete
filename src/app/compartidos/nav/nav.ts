@@ -30,4 +30,8 @@ export class NavComponent {
     this.auth.logout();
     void this.router.navigate(["/"]);
   }
+
+ irALogin() {
+    this.router.navigate(["/inicioSesion"]);
+  }
 }

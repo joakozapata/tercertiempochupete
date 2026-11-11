@@ -1,14 +1,21 @@
 import { Injectable, inject, signal } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, tap } from "rxjs";
-import type { Usuario } from "../models/producto";
+
+export interface Usuario {
+  id: number;
+  nombre: string;
+  email: string;
+  rol: 'user' | 'admin';
+  creado?: string;
+}
 
 @Injectable({
   providedIn: "root",
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = "http://localhost/api-proyecto"; // Ajusta según tu backend
+  private apiUrl = "http://localhost/api_proyecto/public/usuarios";
 
   readonly user = signal<Usuario | null>(this.getStoredUser());
 
@@ -17,31 +24,65 @@ export class AuthService {
     return stored ? JSON.parse(stored) : null;
   }
 
-  isAuthenticated(): boolean {
-    return this.user() !== null && !!localStorage.getItem("token");
+  getToken(): string | null {
+    return localStorage.getItem("token");
   }
 
-  isAdmin(): boolean {
+  estaLogueado(): boolean {
+    return this.user() !== null && !!this.getToken();
+  }
+
+  // <--- SE AGREGA ESTO PARA EVITAR EL ERROR EN EL COMPONENTE
+  isAuthenticated(): boolean {
+    return this.estaLogueado();
+  }
+
+  esAdmin(): boolean {
     const u = this.user();
     return u !== null && u.rol === "admin";
   }
 
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post<{ token: string; usuario: Usuario }>(`${this.apiUrl}/usuarios/login`, credentials).pipe(
-      tap((res) => {
-        localStorage.setItem("token", res.token);
-        localStorage.setItem("usuario", JSON.stringify(res.usuario));
-        this.user.set(res.usuario);
-      })
-    );
+  // <--- AGREGA ESTE ALIAS AQUÍ
+  isAdmin(): boolean {
+    return this.esAdmin();
   }
 
-  register(data: { nombre: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/usuarios/registro`, data);
+  nombreUsuario(): string {
+    return this.user()?.nombre ?? "";
+  }
+
+login(credentials: { email: string; clave?: string; password?: string }): Observable<any> {
+    const passwordAEnviar = credentials.clave ?? credentials.password ?? "";
+    return this.http
+      .post<{ token: string; usuario: Usuario }>(`${this.apiUrl}/login`, {
+        email: credentials.email,
+        contraseña: passwordAEnviar,
+      })
+      .pipe(
+        tap((res) => {
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("usuario", JSON.stringify(res.usuario));
+          this.user.set(res.usuario);
+        })
+      );
+  }
+
+ registro(data: { nombre: string; email: string; clave?: string; password?: string }): Observable<any> {
+    const passwordAEnviar = data.clave ?? data.password ?? "";
+    return this.http.post(`${this.apiUrl}/registro`, {
+      nombre: data.nombre,
+      email: data.email,
+      contraseña: passwordAEnviar,
+    });
+  }
+
+  // Alias para que 'register' (en inglés) apunte a 'registro'
+  register(data: { nombre: string; email: string; clave?: string; password?: string }): Observable<any> {
+    return this.registro(data);
   }
 
   loadProfile(): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.apiUrl}/usuarios`).pipe(
+    return this.http.get<Usuario>(this.apiUrl).pipe(
       tap((usuario) => {
         localStorage.setItem("usuario", JSON.stringify(usuario));
         this.user.set(usuario);
@@ -49,7 +90,7 @@ export class AuthService {
     );
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
     this.user.set(null);

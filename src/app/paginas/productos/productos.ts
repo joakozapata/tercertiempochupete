@@ -61,9 +61,10 @@ export class ProductosComponent implements OnInit {
     }
   }
 
-  cargarProductos() {
+ cargarProductos() {
     this.loading.set(true);
-    this.productService.getProductos().subscribe({
+    // Cambiamos getProductos() por listar() para que coincida con el servicio
+    this.productService.listar().subscribe({
       next: (data) => {
         this.catalog.set(data);
         this.loading.set(false);
