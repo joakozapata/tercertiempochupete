@@ -41,7 +41,7 @@ export class CarritoComponent implements OnInit {
     const img = item.producto?.imagen || item.imagen;
     if (!img) return this.fallback;
     if (img.startsWith("http")) return img;
-    return `http://localhost/api-proyecto/uploads/${img}`;
+   return `http://localhost/API_TercerTiempo/uploads/${img}`;
   }
 
   increase(item: ItemCarrito) {

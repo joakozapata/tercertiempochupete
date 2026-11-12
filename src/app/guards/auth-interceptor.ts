@@ -1,17 +1,17 @@
-// guards/auth-interceptor.ts
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from '../servicios/auth-servicio'; // <-- Apunta al nombre exacto de tu archivo
 
-export const authInterceptor: HttpInterceptorFn = (peticion, siguiente) => {
-  const token = inject(AuthService).getToken();
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  // Obtiene el token guardado en el localStorage (ajusta la clave si usas otra, ej: 'token')
+  const token = localStorage.getItem('token');
 
   if (token) {
-    const peticionClonada = peticion.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
+    const cloned = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
     });
-    return siguiente(peticionClonada);
+    return next(cloned);
   }
 
-  return siguiente(peticion);
+  return next(req);
 };

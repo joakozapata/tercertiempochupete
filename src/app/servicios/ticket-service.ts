@@ -7,7 +7,7 @@ import { Observable } from "rxjs";
 })
 export class TicketService {
   private http = inject(HttpClient);
-  private apiUrl = "http://localhost/api-proyecto";
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public'; // URL unificada con /public y el nombre correcto
 
   // Obtener ticket existente por ID de compra
   getTicket(id_compra: number): Observable<any> {

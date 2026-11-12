@@ -10,7 +10,7 @@ import { CarritoService } from "./servicios-carrito";
 export class CompraService {
   private http = inject(HttpClient);
   private carritoService = inject(CarritoService);
-  private apiUrl = "http://localhost/api_proyecto/public"; // URL corregida y unificada
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public'; // URL corregida y unificada
 
   // Finalizar compra (Checkout)
   finalizarCompra(datosEnvio?: any): Observable<any> {

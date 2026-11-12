@@ -1,49 +1,69 @@
-import { CurrencyPipe, DatePipe } from "@angular/common";
-import { Component, inject, OnInit, signal } from "@angular/core";
-import { MessageService } from "primeng/api";
-import { ButtonModule } from "primeng/button";
-import { CardModule } from "primeng/card";
-import { TableModule } from "primeng/table";
-import { TagModule } from "primeng/tag";
-import type { Compra, Ticket } from "../../models/producto"; // Nota: ajustado a singular según tu modelo
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CardModule } from 'primeng/card';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
-  selector: "app-mis-compras",
+  selector: 'app-mis-compras',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, ButtonModule, CardModule, TableModule, TagModule],
-  templateUrl: "./mis-compras.html",
-  styleUrl: "./mis-compras.css",
+  imports: [
+    CommonModule,
+    CardModule,
+    TableModule,
+    TagModule,
+    ButtonModule
+  ],
+  templateUrl: './mis-compras.html',
+  styleUrl: './mis-compras.css'
 })
 export class MisComprasComponent implements OnInit {
-  // Inyección de servicios necesarios para API, alertas y rutas
-  private readonly messages = inject(MessageService);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public';
 
-  // Señales reactivas para almacenar las compras, el estado de carga y el ticket actual
-  readonly purchases = signal<Compra[]>([]);
-  readonly loading = signal(true);
-  readonly ticketLoading = signal<number | null>(null);
+  // Señales exactamente iguales a las que usa tu HTML
+  readonly purchases = signal<any[]>([]);
+  readonly loading = signal<boolean>(true);
+  readonly ticketLoading = signal<string | number | null>(null);
 
-  // Al iniciar el componente, se solicitan las compras del usuario a la API
   ngOnInit() {
-  // Sin API, iniciamos con una lista vacía o de prueba
-  this.purchases.set([]);
-  this.loading.set(false);
-}
-
-  // Función auxiliar para obtener el ID correcto de la compra (soporta id_compra o id)
-  purchaseId(purchase: Compra) { 
-    return purchase.id_compra ?? purchase.id; 
+    this.cargarCompras();
   }
 
-  // Función para solicitar la generación y apertura del ticket PDF de una compra específica
-  ticket(purchase: Compra) {
-  const id = this.purchaseId(purchase);
-  this.ticketLoading.set(id);
+  cargarCompras() {
+    this.loading.set(true);
+    this.http.get<any>(`${this.apiUrl}/pedidos`).subscribe({
+      next: (response) => {
+        // Soporta tanto si la API responde un array directo como un objeto con propiedad
+        const data = Array.isArray(response) ? response : response?.pedidos || [];
+        this.purchases.set(data);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error al cargar las compras:', err);
+        this.loading.set(false);
+      }
+    });
+  }
 
-  // Simulamos la generación del ticket localmente con un pequeño retraso
-  setTimeout(() => {
-    this.ticketLoading.set(null);
-    this.messages.add({ severity: "success", summary: "Ticket generado", detail: `Descargando ticket de la compra #${id}` });
-  }, 600);
-}
+  // Manejador flexible para extraer el ID sin importar cómo venga la propiedad de la base de datos
+  purchaseId(purchase: any): string | number {
+    return purchase.id_pedido ?? purchase.id ?? purchase.numero_ticket ?? '0';
+  }
+
+  // Método que se ejecuta al hacer clic en "Ver ticket"
+  ticket(purchase: any) {
+    const id = this.purchaseId(purchase);
+    this.ticketLoading.set(id);
+
+    // Simula un breve retardo de carga y redirige a la vista del ticket detallado que ya armamos
+    setTimeout(() => {
+      this.ticketLoading.set(null);
+      this.router.navigate(['/ticket', id]);
+    }, 400);
+  }
 }

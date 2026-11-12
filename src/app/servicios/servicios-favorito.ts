@@ -8,7 +8,7 @@ import type { Producto } from "../models/producto";
 })
 export class FavoritoService {
   private http = inject(HttpClient);
-  private apiUrl = "http://localhost/api_proyecto/public"; // Ruta exacta a tu backend PHP
+ private readonly apiUrl = 'http://localhost/API_TercerTiempo/public'; // Ruta exacta a tu backend PHP
 
   readonly favorites = signal<Producto[]>([]);
 

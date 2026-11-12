@@ -15,7 +15,7 @@ export interface Usuario {
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = "http://localhost/api_proyecto/public/usuarios";
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public';
 
   readonly user = signal<Usuario | null>(this.getStoredUser());
 

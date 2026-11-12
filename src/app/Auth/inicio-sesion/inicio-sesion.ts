@@ -1,63 +1,74 @@
-import { Component, inject, signal } from "@angular/core";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { Router, RouterLink } from "@angular/router";
-import { MessageService } from "primeng/api";
-import { ButtonModule } from "primeng/button";
-import { CardModule } from "primeng/card";
-import { InputTextModule } from "primeng/inputtext";
-import { PasswordModule } from "primeng/password";
-import { AuthService } from "../../servicios/auth-servicio";
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
-  selector: "app-inicio-sesion",
+  selector: 'app-inicio-sesion',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, ButtonModule, CardModule, InputTextModule, PasswordModule],
-  templateUrl: "./inicio-sesion.html",
-  styleUrl: "./inicio-sesion.css",
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    CardModule,
+    ButtonModule,
+    InputTextModule
+  ],
+  templateUrl: './inicio-sesion.html',
+  styleUrl: './inicio-sesion.css'
 })
 export class LoginComponent {
-  readonly auth: AuthService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
+  private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly messages = inject(MessageService);
-  readonly loading = signal(false);
-  
-  readonly form = new FormGroup({
-    email: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.email] }),
-    password: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-  });
 
-  invalid(control: "email" | "password") {
-    const field = this.form.controls[control];
-    return field.invalid && (field.dirty || field.touched);
-  }
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public';
+
+  // Señal para manejar el estado de carga del botón
+  readonly loading = signal<boolean>(false);
+
+  // Formulario reactivo con los nombres exactos que usa tu HTML ([formGroup]="form")
+  form: FormGroup = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    clave: ['', [Validators.required, Validators.minLength(4)]]
+  });
 
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    
-    this.loading.set(true);
 
-    // Llamada asíncrona real al AuthService conectado a la API y manejo de JWT
-    this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => {
+    this.loading.set(true);
+    const credentials = this.form.value;
+
+    // Petición POST a tu API de PHP (ajusta la ruta del endpoint si difiere en tu backend, ej: /auth/login)
+    this.http.post<any>(`${this.apiUrl}/auth/login`, credentials).subscribe({
+      next: (response) => {
         this.loading.set(false);
-        this.messages.add({ 
-          severity: "success", 
-          summary: "Bienvenido", 
-          detail: "Sesión iniciada correctamente." 
-        });
-        void this.router.navigate(["/productos"]);
+
+        // Extrae el token y el rol de la respuesta del backend
+        const token = response.token || response.access_token;
+        const rol = response.rol || response.user?.rol || 'cliente';
+
+        if (token) {
+          localStorage.setItem('token', token);
+          localStorage.setItem('rol', rol);
+
+          // Redirige al catálogo o a la página principal tras iniciar sesión con éxito
+          this.router.navigate(['/productos']);
+        } else {
+          alert('No se pudo autenticar correctamente.');
+        }
       },
       error: (err) => {
+        console.error('Error al iniciar sesión:', err);
         this.loading.set(false);
-        console.error("Error en login", err);
-        this.messages.add({ 
-          severity: "error", 
-          summary: "No pudimos ingresar", 
-          detail: err.error?.mensaje || "Credenciales incorrectas. Revisá tu correo y contraseña." 
-        });
+        alert('Credenciales incorrectas o error de conexión con la API.');
       }
     });
   }

@@ -1,93 +1,71 @@
-import { Component, inject, signal } from "@angular/core";
-import { CommonModule, CurrencyPipe } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { Router } from "@angular/router";
-import { MessageService } from "primeng/api";
-import { CardModule } from "primeng/card";
-import { ButtonModule } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
-import { TableModule } from "primeng/table";
-import { CarritoService } from "../../servicios/servicios-carrito"; // Ajusta la ruta si corresponde
-import { CompraService } from "../../servicios/compra-service";   // Ajusta la ruta si corresponde
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { CarritoService } from '../../servicios/servicios-carrito';
 
 @Component({
-  selector: "app-compra",
+  selector: 'app-compra',
   standalone: true,
   imports: [
     CommonModule,
-    CurrencyPipe,
     FormsModule,
+    RouterLink,
     CardModule,
     ButtonModule,
-    InputTextModule,
-    TableModule
+    InputTextModule
   ],
-  templateUrl: "./compra.html",
-  styleUrl: "./compra.css",
+  templateUrl: './compra.html', // O puedes usar tu template inline si lo prefieres
+  styleUrl: './compra.css'
 })
 export class CompraComponent {
   readonly carritoService = inject(CarritoService);
-  private readonly compraService = inject(CompraService);
-  private readonly messageService = inject(MessageService);
+  private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
 
-  // Estado de carga para el botón de confirmar
-  readonly loading = signal(false);
+  readonly loading = signal<boolean>(false);
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public';
 
-  // Formulario de datos de envío/contacto exigido para la orden
+  // Objeto enlazado con [(ngModel)] en tu HTML
   datosEnvio = {
-    direccion: "",
-    ciudad: "",
-    codigoPostal: "",
-    telefono: ""
+    direccion: '',
+    ciudad: '',
+    codigoPostal: '',
+    telefono: ''
   };
 
   finalizarPedido() {
-    // Validar datos básicos de envío
+    // Validar campos obligatorios básicos antes de enviar
     if (!this.datosEnvio.direccion || !this.datosEnvio.ciudad || !this.datosEnvio.telefono) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Campos incompletos",
-        detail: "Por favor, completa los datos de envío obligatorios."
-      });
-      return;
-    }
-
-    if (this.carritoService.items().length === 0) {
-      this.messageService.add({
-        severity: "warn",
-        summary: "Carrito vacío",
-        detail: "No tienes productos en el carrito para comprar."
-      });
+      alert('Por favor, completa los campos obligatorios de envío y contacto.');
       return;
     }
 
     this.loading.set(true);
 
-    // Llamada al servicio de compra para registrar el checkout en la API
-    this.compraService.finalizarCompra(this.datosEnvio).subscribe({
-      next: (res) => {
+    const payload = {
+      ...this.datosEnvio,
+      items: this.carritoService.items(),
+      total: this.carritoService.total()
+    };
+
+    // Envío del pedido a tu API PHP
+    this.http.post(`${this.apiUrl}/pedidos/crear`, payload).subscribe({
+      next: () => {
         this.loading.set(false);
-        this.messageService.add({
-          severity: "success",
-          summary: "¡Compra realizada!",
-          detail: "Tu orden ha sido registrada exitosamente."
-        });
-
-        // Vaciar el carrito localmente tras el éxito
+        // Limpiamos el carrito localmente tras el éxito
         this.carritoService.clear().subscribe();
-
-        // Redirigir al historial de mis compras para ver/descargar el ticket PDF
-        this.router.navigate(["/mis-compras"]);
+        // Redirigimos al historial o a una vista de confirmación
+        this.router.navigate(['/mis-compras']);
       },
       error: (err) => {
+        console.error('Error al procesar el pedido:', err);
         this.loading.set(false);
-        console.error("Error al procesar la compra", err);
-        this.messageService.add({
-          severity: "error",
-          summary: "Error",
-          detail: "Ocurrió un error al procesar tu compra. Intenta nuevamente."
-        });
+        alert('Hubo un error al registrar tu compra. Inténtalo nuevamente.');
       }
     });
   }

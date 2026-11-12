@@ -1,42 +1,46 @@
-import { Component, inject } from "@angular/core";
-import { CurrencyPipe } from "@angular/common";
-import { RouterLink } from "@angular/router";
-import { ButtonModule } from "primeng/button";
-import { CardModule } from "primeng/card";
-import { TagModule } from "primeng/tag";
-import { FavoritoService } from "../../servicios/servicios-favorito";
-import { CarritoService } from "../../servicios/servicios-carrito";
-import { MessageService } from "primeng/api";
-import type { Producto } from "../../models/producto";
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+import { FavoritoService } from '../../servicios/servicios-favorito';
+import { CarritoService } from '../../servicios/servicios-carrito';
+import type { Producto } from '../../models/producto';
 
 @Component({
-  selector: "app-favoritos",
+  selector: 'app-favoritos',
   standalone: true,
-  imports: [CurrencyPipe, RouterLink, ButtonModule, CardModule, TagModule],
-  templateUrl: "./favoritos.html",
-  styleUrl: "./favoritos.css",
+  imports: [CommonModule, RouterLink, CardModule, ButtonModule],
+  templateUrl: './favoritos.html',
+  styleUrl: './favoritos.css'
 })
-export class FavoritosComponent {
-  readonly favoritesService = inject(FavoritoService);
-  private readonly cart = inject(CarritoService);
-  private readonly messages = inject(MessageService);
+export class FavoritosComponent implements OnInit {
+  private readonly favoritoService = inject(FavoritoService);
+  private readonly carritoService = inject(CarritoService);
 
-  readonly favorites = this.favoritesService.favorites;
-  readonly fallback = "https://images.unsplash.com/photo-1515555230216-82228b88ea98?w=900&h=900&fit=crop&auto=format";
+  // Expone la señal de favoritos directamente a la vista
+  readonly favorites = this.favoritoService.favorites;
 
- remove(product: Producto) {
-    this.favoritesService.remove(product).subscribe({
-      next: () => {
-        this.messages.add({ severity: "info", summary: "Eliminado de favoritos", detail: product.nombre });
-      }
+  // Imagen de respaldo por si el producto no tiene foto cargada
+  readonly fallback = 'assets/placeholder-producto.png'; // Ajusta la ruta si tienes una imagen por defecto
+
+  ngOnInit() {
+    this.favoritoService.load().subscribe({
+      error: (err) => console.error('Error al cargar favoritos:', err)
     });
   }
 
   addToCart(product: Producto) {
-    this.cart.add(product).subscribe({
-      next: () => {
-        this.messages.add({ severity: "success", summary: "Añadido al carrito", detail: product.nombre });
-      }
+    this.carritoService.add(product).subscribe({
+      next: () => console.log('Producto agregado al carrito desde favoritos'),
+      error: (err) => console.error('Error al agregar al carrito:', err)
+    });
+  }
+
+  remove(product: Producto) {
+    this.favoritoService.remove(product).subscribe({
+      next: () => console.log('Producto eliminado de favoritos'),
+      error: (err) => console.error('Error al quitar de favoritos:', err)
     });
   }
 }

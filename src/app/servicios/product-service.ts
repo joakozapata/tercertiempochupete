@@ -8,7 +8,7 @@ import type { Producto } from "../models/producto"; // Asegúrate de que la ruta
 })
 export class ProductService {
   private http = inject(HttpClient);
-  private apiUrl = "http://localhost/api_proyecto/public/productos"; // Ajusta con la carpeta real de tu proyecto local
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public'; // Ajusta con la carpeta real de tu proyecto local
 
   // Listar todos o buscar por texto (ej: ?buscar=remera)
   listar(buscar: string = ""): Observable<Producto[]> {

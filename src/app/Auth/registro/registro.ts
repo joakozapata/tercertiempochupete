@@ -1,66 +1,75 @@
-import { Component, inject, signal } from "@angular/core";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { Router, RouterLink } from "@angular/router";
-import { MessageService } from "primeng/api";
-import { ButtonModule } from "primeng/button";
-import { CardModule } from "primeng/card";
-import { InputTextModule } from "primeng/inputtext";
-import { PasswordModule } from "primeng/password";
-import { AuthService } from "../../servicios/auth-servicio";
+import { Component, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+
 
 @Component({
-  selector: "app-registro",
+  selector: 'app-registro',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, ButtonModule, CardModule, InputTextModule, PasswordModule],
-  templateUrl: "./registro.html",
-  styleUrl: "./registro.css",
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    CardModule,
+    ButtonModule,
+    InputTextModule,
+    PasswordModule
+  ],
+  templateUrl: './registro.html',
+  styleUrl: './registro.css'
 })
 export class RegistroComponent {
-  readonly auth: AuthService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
+  private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly messages = inject(MessageService);
-  readonly loading = signal(false);
 
-  readonly form = new FormGroup({
-    nombre: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
-    email: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.email] }),
-    password: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.minLength(8)] }),
-    confirmar: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
+  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public';
+
+  // Señal para controlar el estado de carga del botón
+  readonly loading = signal<boolean>(false);
+
+  // Formulario reactivo con los nombres exactos que usa tu HTML
+  form: FormGroup = this.fb.group({
+    nombre: ['', [Validators.required, Validators.minLength(3)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmar: ['', [Validators.required]]
   });
 
-  passwordMismatch() {
-    const value = this.form.getRawValue();
-    return Boolean(value.confirmar && value.password !== value.confirmar);
-  }
+  // Computed signal para verificar si las contraseñas no coinciden (usada en tu @if)
+  readonly passwordMismatch = computed(() => {
+    const pass = this.form.get('password')?.value;
+    const confirm = this.form.get('confirmar')?.value;
+    const confirmTouched = this.form.get('confirmar')?.touched;
+    return confirmTouched && pass && confirm && pass !== confirm;
+  });
 
   submit() {
     if (this.form.invalid || this.passwordMismatch()) {
       this.form.markAllAsTouched();
       return;
     }
-    
-    this.loading.set(true);
-    const { confirmar: _, ...payload } = this.form.getRawValue();
 
-    // Llamada asíncrona real al AuthService conectado a la API de PHP
-    this.auth.register(payload).subscribe({
-      next: () => {
+    this.loading.set(true);
+    const formData = this.form.value;
+
+    // Petición POST a tu API de PHP para registrar el usuario
+    this.http.post<any>(`${this.apiUrl}/auth/registro`, formData).subscribe({
+      next: (response) => {
         this.loading.set(false);
-        this.messages.add({ 
-          severity: "success", 
-          summary: "Cuenta creada", 
-          detail: "Ya podés iniciar sesión." 
-        });
-        void this.router.navigate(["/auth/inicio-sesion"]); // Ajusta la ruta si es /login según tus rutas
+        alert('¡Cuenta creada con éxito! Por favor, inicia sesión.');
+        this.router.navigate(['/inicioSesion']);
       },
       error: (err) => {
+        console.error('Error al registrar usuario:', err);
         this.loading.set(false);
-        console.error("Error en registro", err);
-        this.messages.add({ 
-          severity: "error", 
-          summary: "No pudimos registrarte", 
-          detail: err.error?.mensaje || "Revisá los datos o el correo electrónico ya está registrado." 
-        });
+        alert('Hubo un error al registrar la cuenta. Es posible que el correo ya esté en uso.');
       }
     });
   }
