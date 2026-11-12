@@ -11,12 +11,9 @@
 .catalog-page {
   width: 100%;
   max-width: 1184px;
-
   min-height: 650px;
-
   margin: 0 auto;
   padding: 65px 0 85px;
-
   box-sizing: border-box;
 }
 
@@ -28,7 +25,6 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-
   gap: 25px;
   margin-bottom: 30px;
 }
@@ -40,22 +36,17 @@
 
 .catalog-title > span {
   color: #31d09e;
-
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.5px;
-
   margin-bottom: 8px;
 }
 
 .catalog-title h1 {
   margin: 0;
-
   color: #f5f5f5;
-
   font-family: 'Barlow Condensed', sans-serif;
   font-size: clamp(36px, 4vw, 52px);
-
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -68,17 +59,13 @@
 .search-box {
   width: 290px;
   height: 38px;
-
   display: flex;
   align-items: center;
   gap: 10px;
-
   padding: 0 12px;
-
   background: #18181b;
   border: 1px solid #38383d;
   border-radius: 6px;
-
   transition: border-color 0.2s;
 }
 
@@ -93,14 +80,11 @@
 
 :host ::ng-deep .search-box input {
   width: 100%;
-
   background: transparent !important;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
-
   color: #ffffff !important;
-
   font-family: 'Inter', sans-serif;
   font-size: 12px;
 }
@@ -115,9 +99,7 @@
 
 .product-grid {
   display: grid;
-
   grid-template-columns: repeat(3, minmax(0, 1fr));
-
   gap: 18px;
 }
 
@@ -127,15 +109,11 @@
 
 :host ::ng-deep .product-card {
   height: 100%;
-
   background: #18181b !important;
   border: 1px solid #26262a !important;
   border-radius: 10px !important;
-
   overflow: hidden;
-
   color: #ffffff !important;
-
   transition:
     transform 0.2s,
     border-color 0.2s,
@@ -151,7 +129,6 @@
 :host ::ng-deep .product-card .p-card-body {
   height: 100%;
   padding: 15px !important;
-
   display: flex;
   flex-direction: column;
 }
@@ -175,27 +152,20 @@
 
 .product-media {
   position: relative;
-
   width: 100%;
   height: 230px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: #101012;
-
   overflow: hidden;
 }
 
 .product-media img {
   width: 100%;
   height: 100%;
-
   object-fit: contain;
-
   padding: 12px;
-
   transition: transform 0.3s;
 }
 
@@ -203,7 +173,6 @@
   transform: scale(1.05);
 }
 
-/* Etiqueta sin stock */
 .product-media p-tag {
   position: absolute;
   top: 12px;
@@ -216,7 +185,6 @@
 
 .product-name {
   color: #f5f5f5;
-
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 800;
@@ -224,7 +192,6 @@
 
 .product-category {
   color: #31d09e;
-
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -233,11 +200,8 @@
 
 .description {
   min-height: 35px;
-
   margin: 0 0 15px;
-
   color: #85858c;
-
   font-size: 11px;
   line-height: 1.6;
 }
@@ -245,11 +209,9 @@
 /* Precio */
 .price {
   color: #31d09e;
-
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 27px;
   font-weight: 800;
-
   margin-bottom: 12px;
 }
 
@@ -260,28 +222,31 @@
 .card-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 4px;
 }
 
-/* Agregar */
+/* Agregar (ocupa todo el espacio restante) */
 :host ::ng-deep .add-button {
   flex: 1;
-
   display: flex;
   justify-content: center;
-
   background: #31d09e !important;
   border: 1px solid #31d09e !important;
   border-radius: 5px !important;
-
   color: #080808 !important;
-
   padding: 8px !important;
-
   font-size: 11px !important;
   font-weight: 700 !important;
-
   transition: 0.2s;
+}
+
+:host ::ng-deep .add-button .p-button {
+  background: transparent !important;
+  border: none !important;
+  color: #080808 !important;
+  width: 100%;
 }
 
 :host ::ng-deep .add-button:hover {
@@ -293,39 +258,68 @@
   opacity: 0.4;
 }
 
-/* Favoritos */
-:host ::ng-deep .favorite-button {
-  width: 34px;
-  height: 34px;
-
-  background: transparent !important;
-  border: 1px solid #44444a !important;
-  border-radius: 5px !important;
-
-  color: #eeeeee !important;
+/* Símbolo de favorito */
+.favorite-button {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid #44444a;
+  border-radius: 5px;
+  color: #eeeeee;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-:host ::ng-deep .favorite-button:hover {
-  color: #31d09e !important;
+.favorite-button .heart-icon {
+  font-size: 18px;
+  line-height: 1;
+  color: #eeeeee;
+  transition: color 0.2s;
+}
+
+.favorite-button:hover {
+  border-color: #31d09e;
+}
+
+.favorite-button:hover .heart-icon {
+  color: #31d09e;
+}
+
+/* Cuando está marcado como favorito */
+.favorite-button.is-favorite {
   border-color: #31d09e !important;
+  background: rgba(49, 208, 158, 0.1) !important;
+}
+
+.favorite-button.is-favorite .heart-icon {
+  color: #31d09e !important;
 }
 
 /* Ver producto */
-:host ::ng-deep .view-button {
-  width: 34px;
-  height: 34px;
-
-  background: transparent !important;
-  border-radius: 5px !important;
-
-  color: #85858c !important;
+.view-button {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid #44444a;
+  border-radius: 5px;
+  color: #85858c;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-:host ::ng-deep .view-button:hover {
-  color: #31d09e !important;
-  background: #252529 !important;
+.view-button:hover {
+  color: #31d09e;
+  border-color: #31d09e;
+  background: #252529;
 }
-
 /* =========================
    CARGANDO
 ========================= */
@@ -347,18 +341,14 @@
 
 .empty-state {
   min-height: 300px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   text-align: center;
-
   background: #18181b;
   border: 1px solid #29292d;
   border-radius: 10px;
-
   padding: 30px;
 }
 
@@ -370,10 +360,8 @@
 
 .empty-state h2 {
   color: #f5f5f5;
-
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 30px;
-
   margin: 0 0 8px;
 }
 
@@ -388,7 +376,6 @@
 
 .dialog-title {
   color: #ffffff;
-
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 25px;
   font-weight: 900;
@@ -399,16 +386,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 25px;
-
   align-items: center;
 }
 
 .product-detail > img {
   width: 100%;
   max-height: 350px;
-
   object-fit: contain;
-
   background: #101012;
   border-radius: 8px;
   padding: 15px;
@@ -429,7 +413,6 @@
 
 .detail-price {
   color: #31d09e;
-
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 35px;
   font-weight: 900;
@@ -488,11 +471,53 @@
     max-height: 250px;
   }
 }
-.card-actions {
-  margin-top: auto;
-  padding-top: 4px;
+
+/* =========================
+   DIÁLOGO DE DETALLES (MODAL)
+========================= */
+
+:host ::ng-deep .product-dialog .p-dialog {
+  background: #18181b !important;
+  border: 1px solid #38383d !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.4) !important;
 }
 
-:host ::ng-deep .favorite-button .pi-heart-fill {
-  color: #31d09e;
+:host ::ng-deep .product-dialog .p-dialog-header {
+  background: #18181b !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #26262a !important;
+  padding: 20px 24px !important;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+:host ::ng-deep .product-dialog .p-dialog-content {
+  background: #18181b !important;
+  color: #ffffff !important;
+  padding: 24px !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+:host ::ng-deep .product-dialog .p-dialog-header-icon {
+  color: #85858c !important;
+  transition: 0.2s;
+}
+
+:host ::ng-deep .product-dialog .p-dialog-header-icon:hover {
+  color: #31d09e !important;
+  background: #252529 !important;
+}
+
+/* Forzar visibilidad del icono de favorito */
+.favorite-button i {
+  font-size: 16px !important;
+  color: #eeeeee !important;
+  display: inline-block !important;
+  visibility: visible !important;
+}
+
+.favorite-button.is-favorite i {
+  color: #31d09e !important;
 }

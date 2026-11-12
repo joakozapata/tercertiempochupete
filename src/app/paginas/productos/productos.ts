@@ -82,7 +82,10 @@ export class ProductosComponent implements OnInit {
 
   addToCart(product: Producto) {
     this.carritoService.add(product).subscribe({
-      next: () => console.log('Producto agregado al carrito con éxito'),
+      next: (res) => {
+        console.log('Producto agregado al carrito con éxito', res);
+        // Opcional: Aquí puedes disparar una alerta o actualizar un contador si lo manejas en el servicio
+      },
       error: (err) => console.error('Error al agregar al carrito:', err)
     });
   }
@@ -94,7 +97,11 @@ export class ProductosComponent implements OnInit {
 
   toggleFavorite(product: Producto) {
     this.favoritoService.toggle(product).subscribe({
-      next: () => console.log('Favorito actualizado'),
+      next: () => {
+        console.log('Favorito actualizado');
+        // Forzamos la recarga de favoritos para que la UI se pinte al instante
+        this.favoritoService.load().subscribe();
+      },
       error: (err) => console.error('Error al actualizar favoritos:', err)
     });
   }
