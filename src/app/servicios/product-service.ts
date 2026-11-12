@@ -8,20 +8,20 @@ import type { Producto } from "../models/producto"; // Asegúrate de que la ruta
 })
 export class ProductService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public'; // Ajusta con la carpeta real de tu proyecto local
+ private readonly apiUrl = 'http://localhost/API_TercerTiempo/public/productos';
 
-  // Listar todos o buscar por texto (ej: ?buscar=remera)
-  listar(buscar: string = ""): Observable<Producto[]> {
+listar(buscar: string = ""): Observable<Producto[]> {
     let params = new HttpParams();
     if (buscar) {
-      params = params.set("buscar", buscar);
+        params = params.set("buscar", buscar);
     }
+    // Apuntamos explícitamente a /productos usando la URL base limpia
     return this.http.get<Producto[]>(this.apiUrl, { params });
-  }
+}
 
   // Ver un producto por ID
   verUno(id: number): Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}/${id}`);
+   return this.http.get<Producto>(`${this.apiUrl}/${id}`);
   }
 
   // Crear producto (admin)
