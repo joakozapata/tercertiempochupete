@@ -1,91 +1,389 @@
 <section class="admin-page">
-  <!-- Cabecera de la sección con título y el botón para agregar un nuevo producto -->
   <div class="page-heading">
-    <div><span>GESTIÓN 3T</span><div>Panel administrativo.</div></div>
-    <p-button label="Nuevo producto" icon="pi pi-plus" (onClick)="newProduct()" />
+    <div class="heading-copy">
+      <span class="eyebrow">TERCER TIEMPO · ADMINISTRACIÓN</span>
+      <h1>Panel de administración</h1>
+      <p>Administrá el catálogo de productos y las cuentas registradas en la tienda.</p>
+    </div>
   </div>
   
-  <!-- Tarjetas con métricas rápidas (cantidad de productos, usuarios y ventas registradas) -->
   <div class="metrics">
-    <div><span>Productos</span><b>{{ products().length }}</b></div>
-    <div><span>Usuarios</span><b>{{ users().length }}</b></div>
-    <div><span>Ventas</span><b>{{ sales().length }}</b></div>
+    <div class="metric-card">
+      <span>Productos en el catálogo</span>
+      <b>{{ products().length }}</b>
+    </div>
+    <div class="metric-card">
+      <span>Usuarios registrados</span>
+      <b>{{ users().length }}</b>
+    </div>
   </div>
 
-  <!-- Pestañas (Tabs) de PrimeNG para alternar entre la gestión de Productos, Usuarios y Ventas -->
-  <p-tabs value="0">
-    <p-tablist>
-      <p-tab value="0">Productos</p-tab>
-      <p-tab value="1">Usuarios</p-tab>
-      <p-tab value="2">Ventas</p-tab>
-    </p-tablist>
-    <p-tabpanels>
-      
-      <!-- PESTAÑA 0: Tabla de administración de Productos -->
-      <p-tabpanel value="0">
-        <p-table [value]="products()" [loading]="loading()" [paginator]="true" [rows]="8" responsiveLayout="stack">
-          <ng-template #header><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></ng-template>
-          <ng-template #body let-product>
-            <tr>
-              <td><b>{{ product.nombre }}</b></td>
-              <td>{{ product.categoria || "—" }}</td>
-              <td>{{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}</td>
-              <td><p-tag [value]="(product.stock ?? 0).toString()" [severity]="(product.stock ?? 0) > 0 ? 'success' : 'danger'" /></td>
-              <td>
-                <div class="row-actions">
-                  <p-button icon="pi pi-pencil" [text]="true" [ariaLabel]="'Editar ' + product.nombre" (onClick)="edit(product)" />
-                  <p-button icon="pi pi-trash" severity="danger" [text]="true" [ariaLabel]="'Eliminar ' + product.nombre" (onClick)="remove(product)" />
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-tabpanel>
-      
-      <!-- PESTAÑA 1: Tabla con la lista de Usuarios registrados -->
-      <p-tabpanel value="1">
-        <p-table [value]="users()" [loading]="loading()" [paginator]="true" [rows]="8">
-          <ng-template #header><tr><th>Nombre</th><th>Email</th><th>Rol</th></tr></ng-template>
-          <ng-template #body let-user>
-            <tr>
-              <td>{{ user.nombre }}</td>
-              <td>{{ user.email }}</td>
-              <td><p-tag [value]="user.rol" [severity]="user.rol === 'admin' ? 'warn' : 'info'" /></td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-tabpanel>
-      
-      <!-- PESTAÑA 2: Tabla con el historial general de Ventas -->
-      <p-tabpanel value="2">
-        <p-table [value]="sales()" [loading]="loading()" [paginator]="true" [rows]="8">
-          <ng-template #header><tr><th>Compra</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></ng-template>
-          <ng-template #body let-sale>
-            <tr>
-              <td>#{{ purchaseId(sale) }}</td>
-              <td>{{ sale.fecha | date:"dd/MM/yyyy HH:mm" }}</td>
-              <td>{{ sale.estado || "Confirmada" }}</td>
-              <td><b>{{ sale.total | currency:"ARS":"symbol-narrow":"1.0-0" }}</b></td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </p-tabpanel>
-    </p-tabpanels>
-  </p-tabs>
+  <div class="admin-tabs" role="tablist" aria-label="Secciones de administración">
+    <button
+      type="button"
+      class="table-count admin-tab"
+      role="tab"
+      [attr.aria-selected]="activeSection() === 'products'"
+      (click)="activeSection.set('products')"
+    >Productos</button>
+    <button
+      type="button"
+      class="table-count admin-tab"
+      role="tab"
+      [attr.aria-selected]="activeSection() === 'users'"
+      (click)="activeSection.set('users')"
+    >Usuarios</button>
+  </div>
+  @if (activeSection() === "products") {
+        <section class="table-card">
+    <div class="table-heading">
+      <div>
+        <h2>Productos existentes</h2>
+        <p>Seleccioná una acción para modificar un producto del catálogo.</p>
+      </div>
+      <div class="table-heading-actions">
+        <span class="table-count">{{ products().length }} en total</span>
+        <p-button
+          label="Agregar producto"
+          icon="pi pi-plus"
+          styleClass="admin-primary-button"
+          (onClick)="newProduct()"
+        />
+      </div>
+    </div>
+    <p-table
+      [value]="products()"
+      [loading]="loading()"
+      [paginator]="products().length > 8"
+      [rows]="8"
+      styleClass="admin-table"
+    >
+      <ng-template #header>
+        <tr><th class="id-heading">ID</th><th>Producto</th><th>Precio</th><th class="actions-heading">Acciones</th></tr>
+      </ng-template>
+      <ng-template #body let-product>
+        <tr>
+          <td class="product-id">#{{ product.id_producto ?? product.id }}</td>
+          <td>
+            <div class="product-cell">
+              <div>
+                <b>{{ product.nombre }}</b>
+                @if (product.descripcion) {
+                  <span>{{ product.descripcion }}</span>
+                }
+              </div>
+            </div>
+          </td>
+          <td class="price-cell">{{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}</td>
+          <td>
+            <div class="row-actions">
+              <p-button
+                label="Editar"
+                icon="pi pi-pencil"
+                severity="secondary"
+                [outlined]="true"
+                styleClass="action-button edit-action"
+                [ariaLabel]="'Editar ' + product.nombre"
+                (onClick)="edit(product)"
+              />
+              <p-button
+                label="Eliminar"
+                icon="pi pi-trash"
+                severity="danger"
+                [outlined]="true"
+                styleClass="action-button delete-action"
+                [ariaLabel]="'Eliminar ' + product.nombre"
+                (onClick)="remove(product)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr><td colspan="4" class="empty-products">Todavía no hay productos. Usá “Agregar producto” para comenzar.</td></tr>
+      </ng-template>
+    </p-table>
+        </section>
+  } @else {
+        <section class="table-card">
+          <div class="table-heading">
+            <div>
+              <h2>Usuarios registrados</h2>
+              <p>Editá sus datos o eliminá cuentas que ya no deban tener acceso.</p>
+            </div>
+            <span class="table-count">{{ users().length }} en total</span>
+          </div>
+          <p-table
+            [value]="users()"
+            [loading]="loadingUsers()"
+            [paginator]="users().length > 8"
+            [rows]="8"
+            styleClass="admin-table"
+          >
+            <ng-template #header>
+              <tr><th class="id-heading">ID</th><th>Nombre</th><th>Email</th><th>Rol</th><th class="actions-heading">Acciones</th></tr>
+            </ng-template>
+            <ng-template #body let-user>
+              <tr>
+                <td class="product-id">#{{ user.id }}</td>
+                <td class="user-name">{{ user.nombre }}</td>
+                <td class="user-email">{{ user.email }}</td>
+                <td>
+                  <span class="table-count">
+                    {{ user.rol === "admin" ? "Administrador" : "Usuario" }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <p-button
+                      label="Editar"
+                      icon="pi pi-pencil"
+                      severity="secondary"
+                      [outlined]="true"
+                      styleClass="action-button edit-action"
+                      [ariaLabel]="'Editar ' + user.nombre"
+                      (onClick)="editUser(user)"
+                    />
+                    <p-button
+                      label="Eliminar"
+                      icon="pi pi-trash"
+                      severity="danger"
+                      [outlined]="true"
+                      styleClass="action-button delete-action"
+                      [ariaLabel]="'Eliminar ' + user.nombre"
+                      [disabled]="isCurrentUser(user)"
+                      [title]="isCurrentUser(user) ? 'No podés eliminar tu propia cuenta' : 'Eliminar usuario'"
+                      (onClick)="removeUser(user)"
+                    />
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr><td colspan="5" class="empty-products">Todavía no hay usuarios registrados.</td></tr>
+            </ng-template>
+          </p-table>
+        </section>
+  }
 </section>
 
-<!-- Diálogo (Modal) para crear o editar un producto -->
-<p-dialog [(visible)]="productDialog" [modal]="true" [draggable]="false" [style]="{ width: 'min(36rem, 94vw)' }">
-  <ng-template #header><div class="dialog-title">{{ editingId() ? "Editar producto" : "Nuevo producto" }}</div></ng-template>
-  <form class="product-form" [formGroup]="form" (ngSubmit)="save()">
-    <label for="admin-name">Nombre</label><input id="admin-name" pInputText formControlName="nombre" />
-    <label for="admin-description">Descripción</label><input id="admin-description" pInputText formControlName="descripcion" />
-    <div class="form-row">
-      <label for="admin-price">Precio<p-inputnumber inputId="admin-price" formControlName="precio" mode="currency" currency="ARS" locale="es-AR" /></label>
-      <label for="admin-stock">Stock<p-inputnumber inputId="admin-stock" formControlName="stock" [min]="0" /></label>
+<p-dialog
+  [(visible)]="productDialog"
+  [modal]="true"
+  [draggable]="false"
+  [closable]="!saving()"
+  [closeOnEscape]="!saving()"
+  [dismissableMask]="false"
+  [style]="{ width: 'min(43rem, 94vw)' }"
+  styleClass="admin-dialog product-editor-dialog"
+>
+  <ng-template #header>
+    <div class="dialog-heading">
+      <span>{{ editingId() !== null ? "EDICIÓN DEL CATÁLOGO" : "NUEVO INGRESO" }}</span>
+      <h2>{{ editingId() !== null ? "Editar producto" : "Agregar producto" }}</h2>
+      <p>Completá los datos que se mostrarán en el catálogo.</p>
     </div>
-    <label for="admin-category">Categoría</label><input id="admin-category" pInputText formControlName="categoria" />
-    <label for="admin-image">URL de imagen</label><input id="admin-image" pInputText formControlName="imagen" />
-    <p-button [label]="editingId() ? 'Guardar cambios' : 'Crear producto'" icon="pi pi-check" type="submit" [loading]="saving()" />
+  </ng-template>
+  <form class="product-form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-field">
+      <label for="admin-name">Nombre del producto <span>Obligatorio</span></label>
+      <input id="admin-name" pInputText formControlName="nombre" placeholder="Ej. Camiseta titular" />
+      @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+        <small class="field-error">Ingresá el nombre del producto.</small>
+      }
+    </div>
+    <div class="form-field">
+      <label for="admin-description">Descripción</label>
+      <input id="admin-description" pInputText formControlName="descripcion" placeholder="Detalles del producto" />
+    </div>
+    <div class="form-grid">
+      <div class="form-field">
+        <label for="admin-price">Precio <span>Obligatorio</span></label>
+        <p-inputnumber
+          inputId="admin-price"
+          formControlName="precio"
+          mode="currency"
+          currency="ARS"
+          locale="es-AR"
+        />
+        @if (form.controls.precio.touched && form.controls.precio.invalid) {
+          <small class="field-error">Ingresá un precio igual o mayor a cero.</small>
+        }
+      </div>
+      <div class="form-field">
+        <label for="admin-image">Archivo de imagen</label>
+        <input id="admin-image" pInputText formControlName="imagen" placeholder="ejemplo.jpg" />
+        <small class="field-hint">Usá el nombre del archivo guardado en la carpeta de imágenes.</small>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <p-button
+        label="Cancelar"
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        styleClass="dialog-cancel-button"
+        [disabled]="saving()"
+        (onClick)="closeProductDialog()"
+      />
+      <p-button
+        [label]="editingId() !== null ? 'Guardar cambios' : 'Crear producto'"
+        icon="pi pi-check"
+        type="submit"
+        [loading]="saving()"
+        styleClass="admin-primary-button"
+      />
+    </div>
   </form>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="userDialog"
+  [modal]="true"
+  [draggable]="false"
+  [closable]="!savingUser()"
+  [closeOnEscape]="!savingUser()"
+  [dismissableMask]="false"
+  [style]="{ width: 'min(38rem, 94vw)' }"
+  styleClass="admin-dialog product-editor-dialog"
+>
+  <ng-template #header>
+    <div class="dialog-heading">
+      <span>CUENTAS REGISTRADAS</span>
+      <h2>Editar usuario</h2>
+      <p>Actualizá el nombre, email y nivel de acceso.</p>
+    </div>
+  </ng-template>
+  <form class="product-form" [formGroup]="userForm" (ngSubmit)="saveUser()">
+    <div class="form-field">
+      <label for="admin-user-name">Nombre <span>Obligatorio</span></label>
+      <input id="admin-user-name" pInputText formControlName="nombre" maxlength="100" />
+      @if (userForm.controls.nombre.touched && userForm.controls.nombre.invalid) {
+        <small class="field-error">Ingresá un nombre de hasta 100 caracteres.</small>
+      }
+    </div>
+    <div class="form-field">
+      <label for="admin-user-email">Email <span>Obligatorio</span></label>
+      <input id="admin-user-email" pInputText type="email" formControlName="email" maxlength="100" />
+      @if (userForm.controls.email.touched && userForm.controls.email.invalid) {
+        <small class="field-error">Ingresá un email válido de hasta 100 caracteres.</small>
+      }
+    </div>
+    <div class="form-field">
+      <label for="admin-user-role">Rol de acceso</label>
+      <select id="admin-user-role" formControlName="rol">
+        <option value="user">Usuario</option>
+        <option value="admin">Administrador</option>
+      </select>
+      @if (isEditingCurrentUser()) {
+        <small class="field-hint">No podés cambiar tu propio rol de administrador.</small>
+      }
+    </div>
+    <div class="dialog-actions">
+      <p-button
+        label="Cancelar"
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        styleClass="dialog-cancel-button"
+        [disabled]="savingUser()"
+        (onClick)="closeUserDialog()"
+      />
+      <p-button
+        label="Guardar cambios"
+        icon="pi pi-check"
+        type="submit"
+        [loading]="savingUser()"
+        styleClass="admin-primary-button"
+      />
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="userDeleteDialog"
+  [modal]="true"
+  [draggable]="false"
+  [closable]="!deletingUserRequest()"
+  [closeOnEscape]="!deletingUserRequest()"
+  [dismissableMask]="!deletingUserRequest()"
+  [style]="{ width: 'min(31rem, 92vw)' }"
+  styleClass="admin-dialog delete-confirm-dialog"
+>
+  <ng-template #header>
+    <div class="delete-heading">
+      <div class="delete-icon"><i class="pi pi-trash" aria-hidden="true"></i></div>
+      <div>
+        <span>CONFIRMACIÓN</span>
+        <h2>Eliminar usuario</h2>
+      </div>
+    </div>
+  </ng-template>
+  <div class="delete-message">
+    <p>¿Querés eliminar la cuenta de <strong>{{ pendingUserRemoval()?.nombre }}</strong>?</p>
+    <span>Las cuentas con compras, carrito o favoritos asociados no se pueden eliminar para conservar esos datos.</span>
+  </div>
+  <div class="dialog-actions">
+    <p-button
+      label="Cancelar"
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      styleClass="dialog-cancel-button"
+      [disabled]="deletingUserRequest()"
+      (onClick)="cancelDeleteUser()"
+    />
+    <p-button
+      label="Eliminar usuario"
+      icon="pi pi-trash"
+      severity="danger"
+      [loading]="deletingUserRequest()"
+      styleClass="delete-confirm-button"
+      (onClick)="confirmDeleteUser()"
+    />
+  </div>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="deleteDialog"
+  [modal]="true"
+  [draggable]="false"
+  [closable]="!deleting()"
+  [closeOnEscape]="!deleting()"
+  [dismissableMask]="!deleting()"
+  [style]="{ width: 'min(31rem, 92vw)' }"
+  styleClass="admin-dialog delete-confirm-dialog"
+>
+  <ng-template #header>
+    <div class="delete-heading">
+      <div class="delete-icon"><i class="pi pi-trash" aria-hidden="true"></i></div>
+      <div>
+        <span>CONFIRMACIÓN</span>
+        <h2>Eliminar producto</h2>
+      </div>
+    </div>
+  </ng-template>
+  <div class="delete-message">
+    <p>¿Querés eliminar <strong>{{ deletingProduct()?.nombre }}</strong>?</p>
+    <span>Esta acción no se puede deshacer.</span>
+  </div>
+  <div class="dialog-actions">
+    <p-button
+      label="Cancelar"
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      styleClass="dialog-cancel-button"
+      [disabled]="deleting()"
+      (onClick)="cancelDelete()"
+    />
+    <p-button
+      label="Eliminar producto"
+      icon="pi pi-trash"
+      severity="danger"
+      [loading]="deleting()"
+      styleClass="delete-confirm-button"
+      (onClick)="confirmDelete()"
+    />
+  </div>
 </p-dialog>

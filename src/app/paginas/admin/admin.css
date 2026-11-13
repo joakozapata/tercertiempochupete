@@ -1,105 +1,544 @@
-/* ==========================================================================
-   ESTILOS DE LA PÁGINA DE ADMINISTRACIÓN (ADMIN)
-   ================================================================---------- */
-
 .admin-page {
+  width: min(100% - 2rem, 76rem);
   min-height: 44rem;
-  padding: clamp(2rem, 5vw, 5rem);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3.5rem) 0;
+  color: var(--text-color);
 }
 
-/* Cabecera del panel */
 .page-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.page-heading span {
-  color: var(--p-primary-color);
-  font-size: .75rem;
-  font-weight: 800;
-  letter-spacing: .18em;
-}
-
-.page-heading > div > div {
-  margin-top: .75rem;
-  font: 900 clamp(3rem, 6vw, 5rem)/.9 "Barlow Condensed", sans-serif;
-  text-transform: uppercase;
-}
-
-/* Tarjetas de métricas superiores */
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.metrics > div {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
-  border: 1px solid var(--surface-border);
-  border-radius: var(--p-border-radius-lg);
-  background: var(--surface-card);
-  color: var(--text-muted-color);
+  gap: 2rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  margin-bottom: 1.5rem;
+  border: 1px solid #293a35;
+  border-radius: 1rem;
+  background: linear-gradient(120deg, #151d1b 0%, #202c28 60%, #263c34 100%);
+  box-shadow: 0 1rem 2.5rem rgb(15 23 42 / 12%);
+  color: #fff;
 }
 
-.metrics b {
-  color: var(--p-primary-color);
-  font: 900 2rem "Barlow Condensed", sans-serif;
+.heading-copy {
+  max-width: 42rem;
 }
 
-/* Acciones en las filas de las tablas */
-.row-actions {
+.eyebrow {
+  color: #71dfb6;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.heading-copy h1 {
+  margin: .55rem 0;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 750;
+  letter-spacing: -.04em;
+}
+
+.heading-copy p {
+  margin: 0;
+  color: #c2cec9;
+  font-size: .95rem;
+  line-height: 1.6;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(12rem, 18rem));
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+
+.metric-card {
   display: flex;
-  gap: .25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #293631;
+  border-radius: .75rem;
+  background: #171d1b;
+  color: #b7c4be;
+  box-shadow: 0 .25rem .8rem rgb(15 23 42 / 4%);
 }
 
-/* Diálogo / Modal */
-.dialog-title {
-  font: 800 1.5rem "Barlow Condensed", sans-serif;
-  text-transform: uppercase;
+.metric-card span {
+  font-size: .85rem;
+  font-weight: 600;
 }
 
-/* Formulario de productos en el diálogo */
-.product-form {
-  display: grid;
-  gap: .7rem;
+.metric-card b {
+  color: #71dfb6;
+  font-size: 1.65rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.product-form > label, 
-.form-row label {
-  display: grid;
-  gap: .45rem;
-  font-size: .8rem;
+.table-card {
+  overflow: hidden;
+  border: 1px solid #293631;
+  border-radius: .9rem;
+  background: #141918;
+  box-shadow: 0 .45rem 1.5rem rgb(0 0 0 / 18%);
+}
+
+.table-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem .75rem;
+}
+
+.table-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: .6rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid #293631;
+}
+
+.admin-tab[aria-selected="true"] {
+  border-color: #4b684d;
+  background: #253526;
+  color: #b7e5b7;
+}
+
+.table-heading h2 {
+  margin: 0;
+  font-size: 1.15rem;
   font-weight: 700;
 }
 
-.product-form > input, 
-:host ::ng-deep .product-form .p-inputnumber, 
-:host ::ng-deep .product-form .p-button {
-  width: 100%;
+.table-heading p {
+  margin: .35rem 0 0;
+  color: var(--text-muted-color);
+  font-size: .85rem;
 }
 
-.form-row {
+.table-count {
+  padding: .4rem .7rem;
+  border: 1px solid #355347;
+  border-radius: 999px;
+  background: #1b2b25;
+  color: #8de1bf;
+  font-size: .75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  min-width: 15rem;
+}
+
+.product-cell > div:last-child {
+  display: grid;
+  gap: .25rem;
+}
+
+.product-cell b {
+  color: #f0f5f2;
+  font-size: .92rem;
+  font-weight: 650;
+}
+
+.product-cell span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #9caaa3;
+  font-size: .78rem;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.price-cell {
+  color: #e7eee9;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.product-id {
+  color: #94a49b;
+  font-size: .8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.actions-heading {
+  width: 14rem;
+  text-align: right;
+}
+
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .55rem;
+}
+
+:host ::ng-deep .action-button.p-button {
+  min-height: 2.3rem;
+  padding: .45rem .7rem;
+  border-radius: .45rem;
+  font-size: .78rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .edit-action.p-button {
+  border: 1px solid #3c594c !important;
+  background: #1b2b24 !important;
+  color: #bde8d1 !important;
+}
+
+:host ::ng-deep .edit-action.p-button:hover {
+  background: #254032 !important;
+}
+
+:host ::ng-deep .delete-action.p-button {
+  border: 1px solid #674141 !important;
+  background: #2b1d1d !important;
+  color: #ffb9b9 !important;
+}
+
+:host ::ng-deep .delete-action.p-button:hover {
+  background: #432424 !important;
+}
+
+.empty-products {
+  padding: 2.5rem 1rem !important;
+  color: #aab8b1;
+  text-align: center;
+}
+
+.dialog-heading span,
+.delete-heading span {
+  color: #71dfb6;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.dialog-heading h2,
+.delete-heading h2 {
+  margin: .3rem 0 0;
+  color: #f0f5f2;
+  font-size: 1.4rem;
+  font-weight: 750;
+}
+
+.dialog-heading p {
+  margin: .4rem 0 0;
+  color: #aab8b1;
+  font-size: .84rem;
+}
+
+.product-form {
+  display: grid;
+  gap: 1rem;
+  padding-top: .75rem;
+}
+
+.form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-/* Media Queries para diseño responsivo */
-@media (max-width: 650px) {
-  .metrics, 
-  .form-row {
-    grid-template-columns: 1fr;
+.form-field {
+  display: grid;
+  align-content: start;
+  gap: .45rem;
+}
+
+.form-field > label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  color: #e5eee9;
+  font-size: .82rem;
+  font-weight: 650;
+}
+
+.form-field > label span {
+  color: #9caaa3;
+  font-size: .67rem;
+  font-weight: 500;
+}
+
+.form-field > input,
+:host ::ng-deep .form-field .p-inputnumber,
+:host ::ng-deep .form-field .p-inputnumber-input {
+  width: 100%;
+}
+
+.form-field > input,
+:host ::ng-deep .form-field .p-inputnumber-input {
+  min-height: 2.75rem;
+  border: 1px solid #3a4841;
+  border-radius: .55rem;
+  background: #0e1311;
+  color: #f2f6f3;
+  font-size: .87rem;
+}
+
+.form-field > input {
+  padding: .7rem .8rem;
+}
+
+.form-field > input:focus,
+:host ::ng-deep .form-field .p-inputnumber-input:focus {
+  border-color: #54bd91;
+  box-shadow: 0 0 0 3px rgb(84 189 145 / 16%);
+  outline: 0;
+}
+
+.field-hint {
+  color: #91a198;
+  font-size: .7rem;
+  line-height: 1.4;
+}
+
+.field-error {
+  color: #ff9a9a;
+  font-size: .73rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .7rem;
+  padding-top: .5rem;
+}
+
+.delete-heading {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+}
+
+.delete-icon {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 2.8rem;
+  place-items: center;
+  border: 1px solid #6b3e3e;
+  border-radius: .75rem;
+  background: #2b1d1d;
+  color: #ffaaaa;
+  font-size: 1.2rem;
+}
+
+.delete-heading h2 {
+  margin-top: .2rem;
+}
+
+.delete-message {
+  padding: .5rem 0 1.2rem;
+}
+
+.delete-message p {
+  margin: 0 0 .45rem;
+  color: #eff3f0;
+  font-size: .95rem;
+  line-height: 1.55;
+}
+
+.delete-message strong {
+  color: #fff;
+}
+
+.delete-message > span {
+  color: #aab8b1;
+  font-size: .8rem;
+}
+
+:host ::ng-deep .admin-table .p-datatable-table-container {
+  overflow-x: auto;
+  border-top: 1px solid #293631;
+}
+
+:host ::ng-deep .admin-table .p-datatable-table {
+  min-width: 46rem;
+}
+
+:host ::ng-deep .admin-table .p-datatable-thead > tr > th {
+  padding: .9rem 1rem;
+  border-color: #293631;
+  background: #202724;
+  color: #b7c4be;
+  font-size: .72rem;
+  font-weight: 750;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+:host ::ng-deep .admin-table .p-datatable-tbody > tr > td {
+  padding: .85rem 1rem;
+  border-color: #293631;
+  background: #141918;
+  color: #e8efeb;
+  vertical-align: middle;
+}
+
+:host ::ng-deep .admin-table .p-datatable-tbody > tr:hover {
+  background: #1b2420;
+}
+
+:host ::ng-deep .admin-table .p-paginator {
+  border-color: #293631;
+  background: #171d1b;
+}
+
+:host ::ng-deep .admin-primary-button {
+  min-height: 2.75rem;
+  border: 1px solid #16805e !important;
+  border-radius: .6rem !important;
+  background: #16805e !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+:host ::ng-deep .admin-primary-button:hover {
+  border-color: #11684c !important;
+  background: #11684c !important;
+}
+
+:host ::ng-deep .admin-dialog.p-dialog {
+  overflow: hidden;
+  border: 1px solid #34463d;
+  border-radius: .9rem;
+  background: #151b18;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 55%);
+  color: #e8efeb;
+}
+
+:host ::ng-deep .admin-dialog .p-dialog-header,
+:host ::ng-deep .admin-dialog .p-dialog-content {
+  background: #151b18;
+  color: #e8efeb;
+}
+
+:host ::ng-deep .admin-dialog .p-dialog-header {
+  padding: 1.35rem 1.5rem .75rem;
+}
+
+:host ::ng-deep .admin-dialog .p-dialog-content {
+  padding: .75rem 1.5rem 1.5rem;
+}
+
+:host ::ng-deep .admin-dialog .p-dialog-header-close-button {
+  color: #aab8b1;
+}
+
+:host ::ng-deep .admin-dialog .p-dialog-header-close-button:hover {
+  background: #27322c;
+  color: #fff;
+}
+
+:host ::ng-deep .dialog-cancel-button.p-button {
+  min-height: 2.65rem;
+  padding: .55rem .9rem;
+  border: 1px solid #435149 !important;
+  border-radius: .55rem;
+  background: #1b2420 !important;
+  color: #d3ddd7;
+  font-size: .82rem;
+  font-weight: 650;
+}
+
+:host ::ng-deep .dialog-cancel-button.p-button:hover {
+  background: #252e29 !important;
+}
+
+:host ::ng-deep .delete-confirm-button.p-button {
+  min-height: 2.65rem;
+  min-width: 9.5rem;
+  padding: .55rem .85rem;
+  border-radius: .55rem;
+  background: #a43e3e;
+  font-size: .82rem;
+  font-weight: 700;
+  gap: .45rem;
+}
+
+:host ::ng-deep .delete-confirm-button.p-button:hover {
+  background: #bb4949;
+}
+
+@media (max-width: 700px) {
+  .admin-page {
+    width: min(100% - 1.25rem, 76rem);
   }
-  
+
   .page-heading {
     align-items: stretch;
     flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .table-heading {
+    padding: 1.15rem 1rem .75rem;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .table-heading-actions {
+    align-items: flex-end;
+    flex-direction: column-reverse;
+    gap: .5rem;
+  }
+
+  .table-heading-actions ::ng-deep .admin-primary-button {
+    width: max-content;
+  }
+
+  .table-heading .table-count {
+    display: none;
+  }
+
+  .row-actions {
+    justify-content: flex-start;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions p-button {
+    width: 100%;
+  }
+
+  :host ::ng-deep .admin-dialog .p-dialog-header {
+    padding: 1.15rem 1rem .65rem;
+  }
+
+  :host ::ng-deep .admin-dialog .p-dialog-content {
+    padding: .6rem 1rem 1.15rem;
+  }
+
+  .actions-heading {
+    width: auto;
+    text-align: left;
+  }
+
+  :host ::ng-deep .admin-table .p-datatable-tbody > tr > td {
+    padding: .7rem 1rem;
   }
 }

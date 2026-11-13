@@ -30,6 +30,7 @@ export class NavComponent {
   ];
 
   readonly isLoggedIn = computed(() => this.auth.isAuthenticated());
+  readonly isAdmin = computed(() => this.auth.isAdmin());
   readonly nombreUsuario = computed(() => this.auth.user()?.nombre ?? "");
   readonly cantidadItems = computed(() => this.cart.count());
   private profileRequestedFor: string | null = null;

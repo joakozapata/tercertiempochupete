@@ -11,6 +11,7 @@ import { AdminComponent } from './paginas/admin/admin';
 import { CompraComponent } from './paginas/compra/compra';
 import { MisComprasComponent } from './paginas/mis-compras/mis-compras';
 import { TicketComponent } from './paginas/ticket/ticket';
+import { adminGuard } from './guards/admin-guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'inicio', pathMatch: 'full' },
@@ -25,6 +26,6 @@ export const routes: Routes = [
     { path: 'compra', component: CompraComponent },
     { path: 'mis-compras', component: MisComprasComponent },
     { path: 'ticket/:id', component: TicketComponent },
-    { path: 'admin', component: AdminComponent },
+    { path: 'admin', component: AdminComponent, canActivate: [adminGuard] },
     { path: '**', redirectTo: 'inicio' }
 ];

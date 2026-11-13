@@ -1,67 +1,118 @@
-import { CurrencyPipe, DatePipe } from "@angular/common";
+import { CurrencyPipe } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { ConfirmationService, MessageService } from "primeng/api";
+import { HttpErrorResponse } from "@angular/common/http";
+import { MessageService } from "primeng/api";
 import { ButtonModule } from "primeng/button";
 import { DialogModule } from "primeng/dialog";
 import { InputNumberModule } from "primeng/inputnumber";
 import { InputTextModule } from "primeng/inputtext";
 import { TableModule } from "primeng/table";
-import { TabsModule } from "primeng/tabs";
-import { TagModule } from "primeng/tag";
-import type { Producto, Usuario, Compra } from "../../models/producto";
+import type { Producto, Usuario } from "../../models/producto";
+import { AuthService } from "../../servicios/auth-servicio";
+import { AdminService } from "../../servicios/admin-service";
+import { ProductService } from "../../servicios/product-service";
 
 @Component({
   selector: "app-admin",
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, ReactiveFormsModule, ButtonModule, DialogModule, InputNumberModule, InputTextModule, TableModule, TabsModule, TagModule],
+  imports: [CurrencyPipe, ReactiveFormsModule, ButtonModule, DialogModule, InputNumberModule, InputTextModule, TableModule],
   templateUrl: "./admin.html",
   styleUrl: "./admin.css",
 })
 export class AdminComponent implements OnInit {
-  private readonly confirmation = inject(ConfirmationService);
   private readonly messages = inject(MessageService);
+  private readonly productService = inject(ProductService);
+  private readonly adminService = inject(AdminService);
+  private readonly authService = inject(AuthService);
   
   // Señales reactivas para almacenar los datos que muestra el panel
   readonly products = signal<Producto[]>([]);
   readonly users = signal<Usuario[]>([]);
-  readonly sales = signal<Compra[]>([]);
   readonly loading = signal(true);
+  readonly loadingUsers = signal(true);
   readonly saving = signal(false);
+  readonly savingUser = signal(false);
+  readonly deleting = signal(false);
+  readonly deletingUserRequest = signal(false);
   readonly editingId = signal<number | null>(null);
+  readonly deletingProduct = signal<Producto | null>(null);
+  readonly editingUser = signal<Usuario | null>(null);
+  readonly pendingUserRemoval = signal<Usuario | null>(null);
+  readonly activeSection = signal<"products" | "users">("products");
   productDialog = false;
+  deleteDialog = false;
+  userDialog = false;
+  userDeleteDialog = false;
 
   // Formulario reactivo para administrar los campos del producto
   readonly form = new FormGroup({
     nombre: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
     descripcion: new FormControl("", { nonNullable: true }),
     precio: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
-    stock: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
-    categoria: new FormControl("", { nonNullable: true }),
     imagen: new FormControl("", { nonNullable: true }),
   });
 
+  readonly userForm = new FormGroup({
+    nombre: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
+    email: new FormControl("", { nonNullable: true, validators: [Validators.required, Validators.email, Validators.maxLength(100)] }),
+    rol: new FormControl<"admin" | "user">("user", { nonNullable: true }),
+  });
+
   ngOnInit() { 
-    this.loadDashboard(); 
+    this.loadDashboard();
+    this.loadUsers();
   }
 
-  // Carga simulada local para el panel de administración
   loadDashboard() {
     this.loading.set(true);
-    setTimeout(() => {
-      this.users.set([
-        { id: 1, nombre: "Joaquín Figueroa", email: "joakofigueroa07@gmail.com", rol: "admin" }
-      ]);
-      this.sales.set([]);
-      this.loading.set(false);
-    }, 300);
+    this.productService.listar().subscribe({
+      next: (products) => {
+        this.products.set(products);
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error("No se pudieron cargar los productos:", error);
+        this.loading.set(false);
+        this.messages.add({
+          severity: "error",
+          summary: "Error al cargar",
+          detail: "No se pudieron cargar los productos."
+        });
+      }
+    });
+  }
+
+  loadUsers() {
+    this.loadingUsers.set(true);
+    this.adminService.listarUsuarios().subscribe({
+      next: (users) => {
+        this.users.set(users);
+        this.loadingUsers.set(false);
+      },
+      error: (error) => {
+        console.error("No se pudieron cargar los usuarios:", error);
+        this.loadingUsers.set(false);
+        this.messages.add({
+          severity: "error",
+          summary: "Error al cargar usuarios",
+          detail: this.apiError(error, "No se pudieron cargar los usuarios.")
+        });
+      }
+    });
   }
 
   // Abre el diálogo para dar de alta un producto nuevo
   newProduct() { 
     this.editingId.set(null); 
-    this.form.reset({ nombre: "", descripcion: "", precio: null, stock: null, categoria: "", imagen: "" }); 
+    this.form.reset({ nombre: "", descripcion: "", precio: null, imagen: "" }); 
     this.productDialog = true; 
+  }
+
+  closeProductDialog() {
+    if (!this.saving()) {
+      this.productDialog = false;
+    }
   }
 
   // Abre el diálogo cargando los datos del producto seleccionado para editarlo
@@ -71,14 +122,11 @@ export class AdminComponent implements OnInit {
       nombre: product.nombre, 
       descripcion: product.descripcion ?? "", 
       precio: Number(product.precio), 
-      stock: product.stock ?? 0, 
-      categoria: product.categoria ?? "", 
       imagen: product.imagen ?? "" 
     });
     this.productDialog = true;
   }
 
-  // Guarda los cambios (crea o edita localmente)
   save() {
     if (this.form.invalid) { 
       this.form.markAllAsTouched(); 
@@ -88,69 +136,193 @@ export class AdminComponent implements OnInit {
     this.saving.set(true);
     const id = this.editingId();
     const formValue = this.form.getRawValue();
+    const producto: Partial<Producto> = {
+      nombre: formValue.nombre,
+      descripcion: formValue.descripcion,
+      precio: formValue.precio!,
+      imagen: formValue.imagen
+    };
+    const request = id === null
+      ? this.productService.crear(producto)
+      : this.productService.editar(id, producto);
 
-    setTimeout(() => {
-      const currentProducts = this.products();
-
-      if (id !== null) {
-        // Editamos el producto existente mapeando de forma segura
-        this.products.set(
-          currentProducts.map(p => {
-            const pId = p.id_producto ?? p.id;
-            if (pId === id) {
-              return {
-                ...p,
-                nombre: formValue.nombre,
-                descripcion: formValue.descripcion,
-                precio: formValue.precio!,
-                stock: formValue.stock!,
-                categoria: formValue.categoria,
-                imagen: formValue.imagen
-              };
-            }
-            return p;
-          })
-        );
-        this.messages.add({ severity: "success", summary: "Producto actualizado", detail: formValue.nombre });
-      } else {
-        // Creamos un producto nuevo simulando un ID único
-        const newProd: Producto = {
-          id: Date.now(),
-          id_producto: Date.now(),
-          nombre: formValue.nombre,
-          descripcion: formValue.descripcion,
-          precio: formValue.precio!,
-          stock: formValue.stock!,
-          categoria: formValue.categoria,
-          imagen: formValue.imagen
-        };
-        this.products.set([...currentProducts, newProd]);
-        this.messages.add({ severity: "success", summary: "Producto creado", detail: formValue.nombre });
-      }
-
-      this.saving.set(false);
-      this.productDialog = false;
-      this.form.reset();
-    }, 400);
-  }
-
-  // Pide confirmación y elimina un producto del sistema localmente
-  remove(product: Producto) {
-    const id = product.id_producto ?? product.id;
-    this.confirmation.confirm({
-      header: "Eliminar producto",
-      message: `¿Eliminar ${product.nombre}?`,
-      icon: "pi pi-exclamation-triangle",
-      acceptLabel: "Eliminar",
-      rejectLabel: "Cancelar",
-      accept: () => {
-        this.products.set(this.products().filter(p => (p.id_producto ?? p.id) !== id));
-        this.messages.add({ severity: "success", summary: "Producto eliminado", detail: product.nombre });
+    request.subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.productDialog = false;
+        this.form.reset({ nombre: "", descripcion: "", precio: null, imagen: "" });
+        this.messages.add({
+          severity: "success",
+          summary: id === null ? "Producto creado" : "Producto actualizado",
+          detail: formValue.nombre
+        });
+        this.loadDashboard();
       },
+      error: (error) => {
+        console.error("No se pudo guardar el producto:", error);
+        this.saving.set(false);
+        this.messages.add({
+          severity: "error",
+          summary: "No se pudo guardar",
+          detail: "Revisá la conexión y tus permisos de administrador."
+        });
+      }
     });
   }
 
-  purchaseId(purchase: Compra) { 
-    return purchase.id_compra ?? purchase.id; 
+  remove(product: Producto) {
+    this.deletingProduct.set(product);
+    this.deleteDialog = true;
+  }
+
+  cancelDelete() {
+    if (!this.deleting()) {
+      this.deleteDialog = false;
+      this.deletingProduct.set(null);
+    }
+  }
+
+  confirmDelete() {
+    const product = this.deletingProduct();
+    if (!product || this.deleting()) {
+      return;
+    }
+
+    this.deleting.set(true);
+    this.productService.eliminar(product.id_producto ?? product.id).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.deleteDialog = false;
+        this.deletingProduct.set(null);
+        this.messages.add({
+          severity: "success",
+          summary: "Producto eliminado",
+          detail: product.nombre
+        });
+        this.loadDashboard();
+      },
+      error: (error) => {
+        console.error("No se pudo eliminar el producto:", error);
+        this.deleting.set(false);
+        this.messages.add({
+          severity: "error",
+          summary: "No se pudo eliminar",
+          detail: "Revisá la conexión y tus permisos de administrador."
+        });
+      }
+    });
+  }
+
+  editUser(user: Usuario) {
+    this.editingUser.set(user);
+    this.userForm.controls.rol.enable();
+    this.userForm.reset({ nombre: user.nombre, email: user.email, rol: user.rol });
+    if (this.isCurrentUser(user)) {
+      this.userForm.controls.rol.disable();
+    }
+    this.userDialog = true;
+  }
+
+  closeUserDialog() {
+    if (!this.savingUser()) {
+      this.userDialog = false;
+      this.editingUser.set(null);
+    }
+  }
+
+  isCurrentUser(user: Usuario): boolean {
+    return user.id === this.authService.user()?.id;
+  }
+
+  isEditingCurrentUser(): boolean {
+    const user = this.editingUser();
+    return user !== null && this.isCurrentUser(user);
+  }
+
+  saveUser() {
+    const user = this.editingUser();
+    if (!user || this.userForm.invalid || this.savingUser()) {
+      this.userForm.markAllAsTouched();
+      return;
+    }
+
+    this.savingUser.set(true);
+    const values = this.userForm.getRawValue();
+    this.adminService.editarUsuario(user.id, {
+      nombre: values.nombre.trim(),
+      email: values.email.trim().toLowerCase(),
+      rol: values.rol,
+    }).subscribe({
+      next: () => {
+        this.savingUser.set(false);
+        this.userDialog = false;
+        this.editingUser.set(null);
+        this.messages.add({
+          severity: "success",
+          summary: "Usuario actualizado",
+          detail: values.nombre.trim()
+        });
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error("No se pudo actualizar el usuario:", error);
+        this.savingUser.set(false);
+        this.messages.add({
+          severity: "error",
+          summary: "No se pudo actualizar",
+          detail: this.apiError(error, "Revisá los datos y tus permisos de administrador.")
+        });
+      }
+    });
+  }
+
+  removeUser(user: Usuario) {
+    this.pendingUserRemoval.set(user);
+    this.userDeleteDialog = true;
+  }
+
+  cancelDeleteUser() {
+    if (!this.deletingUserRequest()) {
+      this.userDeleteDialog = false;
+      this.pendingUserRemoval.set(null);
+    }
+  }
+
+  confirmDeleteUser() {
+    const user = this.pendingUserRemoval();
+    if (!user || this.deletingUserRequest()) {
+      return;
+    }
+
+    this.deletingUserRequest.set(true);
+    this.adminService.eliminarUsuario(user.id).subscribe({
+      next: () => {
+        this.deletingUserRequest.set(false);
+        this.userDeleteDialog = false;
+        this.pendingUserRemoval.set(null);
+        this.messages.add({
+          severity: "success",
+          summary: "Usuario eliminado",
+          detail: user.nombre
+        });
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error("No se pudo eliminar el usuario:", error);
+        this.deletingUserRequest.set(false);
+        this.messages.add({
+          severity: "error",
+          summary: "No se pudo eliminar",
+          detail: this.apiError(error, "Revisá las restricciones de la cuenta y tus permisos de administrador.")
+        });
+      }
+    });
+  }
+
+  private apiError(error: unknown, fallback: string): string {
+    if (error instanceof HttpErrorResponse && typeof error.error?.error === "string") {
+      return error.error.error;
+    }
+    return fallback;
   }
 }

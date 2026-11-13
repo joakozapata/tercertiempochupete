@@ -1,18 +1,14 @@
 import { inject } from '@angular/core';
 import { Router, type CanActivateFn } from '@angular/router';
+import { AuthService } from '../servicios/auth-servicio';
 
-export const adminGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = () => {
   const router = inject(Router);
-  
-  // Puedes verificar el token o un rol específico guardado en el localStorage
-  const token = localStorage.getItem('token');
-  const rol = localStorage.getItem('rol'); // O la forma en que guardes el rol del usuario
+  const auth = inject(AuthService);
 
-  if (token && rol === 'admin') {
-    return true; // Permite el paso si es administrador
+  if (!auth.isAuthenticated()) {
+    return router.createUrlTree(['/inicioSesion']);
   }
 
-  // Si no tiene permisos, lo redirige al inicio o al login
-  router.navigate(['/']);
-  return false;
+  return auth.isAdmin() ? true : router.createUrlTree(['/productos']);
 };
