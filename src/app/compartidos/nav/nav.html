@@ -1,53 +1,40 @@
-<p-menubar [model]="items()" styleClass="store-menubar">
-
+<p-menubar [model]="items" styleClass="store-menubar">
   <ng-template #start>
-    <a routerLink="/" class="brand" aria-label="Tercer Tiempo, inicio">
-      <span class="brand-mark">3T</span>
+    <a routerLink="/inicio" class="brand">
+      <span class="brand-mark">TT</span>
       <span class="brand-text">TERCER <b>TIEMPO</b></span>
     </a>
   </ng-template>
 
   <ng-template #end>
     <div class="nav-actions">
+      <a routerLink="/carrito" class="nav-cart" title="Ver carrito">
+        <i class="pi pi-shopping-cart"></i>
+        Carrito
+        @if (cantidadItems() > 0) {
+          <p-badge [value]="cantidadItems().toString()" />
+        }
+      </a>
 
-      <!-- Carrito: siempre visible -->
-      <p-button
-        [icon]="cart.count() > 0 ? 'pi pi-shopping-bag' : 'pi pi-trash'"
-        [text]="true"
-        routerLink="/carrito"
-        [ariaLabel]="cart.count() > 0 ? 'Carrito con ' + cart.count() + ' productos' : 'Carrito vacío'"
-        [badge]="cart.count() > 0 ? cart.count().toString() : undefined"
-        badgeSeverity="success"
-        styleClass="nav-cart"
-      />
-
-      @if (auth.isAuthenticated()) {
-        <p-button
-          [label]="auth.user()?.nombre || 'Mi cuenta'"
-          icon="pi pi-user"
-          [text]="true"
-          routerLink="/perfil"
-          styleClass="nav-user"
-        />
-
+      @if (isLoggedIn()) {
+        <span class="nav-user">
+          <i class="pi pi-user"></i>
+          {{ nombreUsuario() || "Mi cuenta" }}
+        </span>
         <p-button
           label="Salir"
           icon="pi pi-sign-out"
-          severity="secondary"
-          [text]="true"
-          (onClick)="logout()"
           styleClass="nav-logout"
+          (onClick)="logout()"
         />
       } @else {
-        <p-button 
-          label="Ingresar" 
-          icon="pi pi-sign-in" 
-          styleClass="p-button-outlined nav-logout" 
+        <p-button
+          label="Ingresar"
+          icon="pi pi-sign-in"
           routerLink="/inicioSesion"
+          styleClass="btn-emerald"
         />
       }
-
     </div>
   </ng-template>
-
 </p-menubar>
