@@ -47,7 +47,7 @@ export class LoginComponent {
     const credentials = this.form.value;
 
     // Petición POST a tu API de PHP (ajusta la ruta del endpoint si difiere en tu backend, ej: /auth/login)
-    this.http.post<any>(`${this.apiUrl}/auth/login`, credentials).subscribe({
+ this.http.post<any>(`${this.apiUrl}/usuarios/login`, credentials).subscribe({
       next: (response) => {
         this.loading.set(false);
 
