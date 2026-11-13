@@ -5,6 +5,50 @@
   box-sizing: border-box;
 }
 
+.size-inventory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.size-inventory > span {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .5rem;
+  border: 1px solid #355347;
+  border-radius: .45rem;
+  background: #1b2b25;
+  color: #d7eee3;
+  font-size: .75rem;
+}
+
+.size-inventory small {
+  color: #8de1bf;
+}
+
+.inventory-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.size-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: .75rem;
+  padding: .75rem;
+  border: 1px solid #293631;
+  border-radius: .6rem;
+  background: #111614;
+}
+
+.size-row + .size-row {
+  margin-top: .6rem;
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -18,6 +62,13 @@ html, body {
 
 body {
   overflow-x: hidden;
+}
+
+@media (max-width: 700px) {
+  .size-row {
+    grid-template-columns: 1fr 1fr auto;
+    gap: .5rem;
+  }
 }
 
 button,

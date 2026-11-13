@@ -107,7 +107,9 @@ export class CompraComponent implements OnInit {
         this.messages.add({
           severity: "error",
           summary: "No se pudo finalizar la compra",
-          detail: "Revisá tu carrito e intentá nuevamente.",
+          detail: typeof error.error?.error === "string"
+            ? error.error.error
+            : "Revisá tu carrito e intentá nuevamente.",
         });
       },
     });

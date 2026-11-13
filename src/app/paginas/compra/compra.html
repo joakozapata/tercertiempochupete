@@ -33,7 +33,10 @@
             <div class="receipt-item">
               <div>
                 <strong>{{ nombreProducto(item) }}</strong>
-                <span>{{ item.cantidad }} x {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }}</span>
+                <span>
+                  @if (item.talle) { Talle {{ item.talle }} · }
+                  {{ item.cantidad }} x {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }}
+                </span>
               </div>
               <strong>{{ item.cantidad * item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }}</strong>
             </div>
@@ -151,7 +154,10 @@
             <div class="summary-item">
               <div>
                 <strong>{{ nombreProducto(item) }}</strong>
-                <span>Cant. {{ item.cantidad }} · {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }} c/u</span>
+                <span>
+                  @if (item.talle) { Talle {{ item.talle }} · }
+                  Cant. {{ item.cantidad }} · {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }} c/u
+                </span>
               </div>
               <strong>{{ item.cantidad * item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }}</strong>
             </div>

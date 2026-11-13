@@ -47,8 +47,8 @@ export class CarritoService {
     );
   }
 
-  add(producto: Producto): Observable<unknown> {
-    const idProducto = producto.id_producto ?? producto.id;
+  add(producto: Producto, idVariante?: number): Observable<unknown> {
+    const idProducto = idVariante ?? producto.id_producto ?? producto.id;
 
     return this.http.post<unknown>(`${this.apiUrl}/carrito/agregar`, {
       id_producto: idProducto,

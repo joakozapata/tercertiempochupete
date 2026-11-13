@@ -80,7 +80,8 @@ export class CarritoComponent implements OnInit {
   }
 
   increase(item: ItemCarrito) {
-    if (item.cantidad < 99) {
+    const maxStock = Math.min(99, Number(item.producto?.stock ?? 99));
+    if (item.cantidad < maxStock) {
       this.cart.update(item, item.cantidad + 1).subscribe({
         error: (err) => console.error("Error al actualizar cantidad", err)
       });

@@ -215,6 +215,50 @@
   margin-bottom: 12px;
 }
 
+.catalog-inventory {
+  display: grid;
+  gap: .45rem;
+  margin: 0 0 .85rem;
+  color: #b8b8bd;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.size-options button {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .38rem .55rem;
+  border: 1px solid #44444a;
+  border-radius: 5px;
+  background: #101012;
+  color: #eeeeee;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.size-options button.selected {
+  border-color: #31d09e;
+  background: rgb(49 208 158 / 12%);
+  color: #31d09e;
+}
+
+.size-options button:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+
+.size-options small {
+  color: #31d09e;
+  font-size: 10px;
+}
+
 /* =========================
    BOTONES DE PRODUCTOS
 ========================= */

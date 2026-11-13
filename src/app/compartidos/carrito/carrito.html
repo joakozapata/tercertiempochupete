@@ -33,6 +33,9 @@
               <span class="item-category">
                 {{ item.producto?.categoria || "Equipamiento deportivo" }}
               </span>
+              @if (item.talle || item.producto?.talle) {
+                <span class="item-category">Talle: {{ item.talle || item.producto?.talle }}</span>
+              }
               <p class="item-description">
                 {{ item.producto?.descripcion || "Selección oficial Tercer Tiempo." }}
               </p>

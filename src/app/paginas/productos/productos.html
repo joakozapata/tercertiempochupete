@@ -45,7 +45,7 @@
                 [alt]="product.nombre"
               />
 
-              @if (product.stock === 0) {
+              @if (!selectedVariant(product)) {
                 <p-tag
                   value="SIN STOCK"
                   severity="danger"
@@ -75,13 +75,29 @@
             {{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
           </div>
 
-         
+          <div class="catalog-inventory">
+            <span>Talles y stock</span>
+            <div class="size-options">
+              @for (variant of variantsFor(product); track variant.id_producto) {
+                <button
+                  type="button"
+                  [disabled]="variant.stock <= 0"
+                  [class.selected]="selectedVariant(product)?.id_producto === variant.id_producto"
+                  [attr.aria-label]="'Talle ' + variant.talle + ', ' + variant.stock + ' unidades'"
+                  (click)="selectVariant(product, variant)"
+                >
+                  {{ variant.talle }} <small>{{ variant.stock }}</small>
+                </button>
+              }
+            </div>
+          </div>
+
 <!-- Acciones -->
           <div class="card-actions">
             <p-button
-              label="Agregar"
+              [label]="selectedVariant(product) ? 'Agregar' : 'Sin stock'"
               icon="pi pi-shopping-bag"
-              [disabled]="product.stock === 0"
+              [disabled]="!selectedVariant(product)"
               (onClick)="addToCart(product)"
               styleClass="add-button"
             />
@@ -150,9 +166,26 @@
           {{ selected()!.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
         </div>
 
+        <div class="catalog-inventory">
+          <span>Talles y stock</span>
+          <div class="size-options">
+            @for (variant of variantsFor(selected()!); track variant.id_producto) {
+              <button
+                type="button"
+                [disabled]="variant.stock <= 0"
+                [class.selected]="selectedVariant(selected()!)?.id_producto === variant.id_producto"
+                (click)="selectVariant(selected()!, variant)"
+              >
+                {{ variant.talle }} <small>{{ variant.stock }}</small>
+              </button>
+            }
+          </div>
+        </div>
+
         <p-button
-          label="Agregar al carrito"
+          [label]="selectedVariant(selected()!) ? 'Agregar al carrito' : 'Sin stock'"
           icon="pi pi-shopping-bag"
+          [disabled]="!selectedVariant(selected()!)"
           (onClick)="addToCart(selected()!)"
           styleClass="add-button"
         />

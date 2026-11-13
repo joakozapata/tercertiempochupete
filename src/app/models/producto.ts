@@ -11,9 +11,21 @@ export interface Producto {
   descripcion?: string;
   precio: number;
   stock?: number;
+  talle?: string;
+  talles?: VarianteProducto[];
   categoria?: string;
   imagen?: string;
 }
+
+export interface VarianteProducto {
+  id_producto: number;
+  talle: string;
+  stock: number;
+}
+
+export type ProductoInput = Partial<Omit<Producto, "talles">> & {
+  talles?: Array<Pick<VarianteProducto, "talle" | "stock">>;
+};
 
 export interface Usuario {
   id: number;
@@ -32,6 +44,7 @@ export interface ItemCarrito {
   id_producto: number;
   cantidad: number;
   precio_unitario: number;
+  talle?: string;
   producto?: Producto;
   nombre?: string;
   imagen?: string;

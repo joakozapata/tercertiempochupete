@@ -59,7 +59,7 @@
       styleClass="admin-table"
     >
       <ng-template #header>
-        <tr><th class="id-heading">ID</th><th>Producto</th><th>Precio</th><th class="actions-heading">Acciones</th></tr>
+        <tr><th class="id-heading">ID</th><th>Producto</th><th>Talles y stock</th><th>Precio</th><th class="actions-heading">Acciones</th></tr>
       </ng-template>
       <ng-template #body let-product>
         <tr>
@@ -72,6 +72,13 @@
                   <span>{{ product.descripcion }}</span>
                 }
               </div>
+            </div>
+          </td>
+          <td>
+            <div class="size-inventory">
+              @for (variant of product.talles ?? []; track variant.id_producto) {
+                <span><b>{{ variant.talle }}</b><small>{{ variant.stock }} u.</small></span>
+              }
             </div>
           </td>
           <td class="price-cell">{{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}</td>
@@ -100,7 +107,7 @@
         </tr>
       </ng-template>
       <ng-template #emptymessage>
-        <tr><td colspan="4" class="empty-products">Todavía no hay productos. Usá “Agregar producto” para comenzar.</td></tr>
+        <tr><td colspan="5" class="empty-products">Todavía no hay productos. Usá “Agregar producto” para comenzar.</td></tr>
       </ng-template>
     </p-table>
         </section>
@@ -215,6 +222,56 @@
         <input id="admin-image" pInputText formControlName="imagen" placeholder="ejemplo.jpg" />
         <small class="field-hint">Usá el nombre del archivo guardado en la carpeta de imágenes.</small>
       </div>
+    </div>
+    <div class="form-field" formArrayName="talles">
+      <div class="inventory-heading">
+        <label>Talles y stock</label>
+        <p-button
+          label="Agregar talle"
+          icon="pi pi-plus"
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="addSize()"
+        />
+      </div>
+      @for (size of sizeControls; track $index) {
+        <div class="size-row" [formGroupName]="$index">
+          <div class="form-field">
+            <label [for]="'admin-size-' + $index">Talle</label>
+            <input
+              [id]="'admin-size-' + $index"
+              pInputText
+              formControlName="talle"
+              placeholder="Ej. S, M, 42 o Único"
+            />
+            @if (size.controls.talle.touched && size.controls.talle.invalid) {
+              <small class="field-error">Ingresá un talle.</small>
+            }
+          </div>
+          <div class="form-field">
+            <label [for]="'admin-stock-' + $index">Stock disponible</label>
+            <p-inputnumber
+              [inputId]="'admin-stock-' + $index"
+              formControlName="stock"
+              [min]="0"
+              [maxFractionDigits]="0"
+            />
+            @if (size.controls.stock.touched && size.controls.stock.invalid) {
+              <small class="field-error">El stock debe ser un entero igual o mayor a cero.</small>
+            }
+          </div>
+          <p-button
+            icon="pi pi-trash"
+            type="button"
+            severity="danger"
+            [outlined]="true"
+            [disabled]="sizeControls.length === 1"
+            [ariaLabel]="'Quitar talle ' + ($index + 1)"
+            (onClick)="removeSize($index)"
+          />
+        </div>
+      }
     </div>
     <div class="dialog-actions">
       <p-button

@@ -12,7 +12,7 @@ import { MessageService } from 'primeng/api';
 import { ProductService } from '../../servicios/product-service';
 import { CarritoService } from '../../servicios/servicios-carrito';
 import { FavoritoService } from '../../servicios/servicios-favorito';
-import type { Producto } from '../../models/producto';
+import type { Producto, VarianteProducto } from '../../models/producto';
 
 @Component({
   selector: 'app-productos',
@@ -83,11 +83,21 @@ export class ProductosComponent implements OnInit {
   }
 
   addToCart(product: Producto) {
-    this.carritoService.add(product).subscribe({
+    const variant = this.selectedVariant(product);
+    if (!variant) {
+      this.messages.add({
+        severity: 'warn',
+        summary: 'Sin stock disponible',
+        detail: 'Elegí un talle con unidades disponibles para continuar.'
+      });
+      return;
+    }
+
+    this.carritoService.add(product, variant.id_producto).subscribe({
       next: () => this.messages.add({
         severity: 'success',
         summary: 'Producto agregado',
-        detail: 'El producto se agregó correctamente al carrito.'
+        detail: `${product.nombre} · Talle ${variant.talle} agregado al carrito.`
       }),
       error: (err) => {
         console.error('Error al agregar al carrito:', err);
@@ -98,6 +108,30 @@ export class ProductosComponent implements OnInit {
         });
       }
     });
+  }
+
+  variantsFor(product: Producto): VarianteProducto[] {
+    return product.talles ?? [{
+      id_producto: product.id_producto ?? product.id,
+      talle: product.talle ?? 'Único',
+      stock: Number(product.stock ?? 0),
+    }];
+  }
+
+  selectedVariant(product: Producto): VarianteProducto | null {
+    const variants = this.variantsFor(product);
+    const selectedId = this.selectedTalles[product.id];
+    return variants.find((variant) => variant.id_producto === selectedId && variant.stock > 0)
+      ?? variants.find((variant) => variant.stock > 0)
+      ?? null;
+  }
+
+  readonly selectedTalles: Record<number, number> = {};
+
+  selectVariant(product: Producto, variant: VarianteProducto) {
+    if (variant.stock > 0) {
+      this.selectedTalles[product.id] = variant.id_producto;
+    }
   }
 
   isFavorite(product: Producto): boolean {

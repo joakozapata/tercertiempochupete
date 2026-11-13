@@ -1,6 +1,6 @@
 import { CurrencyPipe } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { HttpErrorResponse } from "@angular/common/http";
 import { MessageService } from "primeng/api";
 import { ButtonModule } from "primeng/button";
@@ -8,7 +8,7 @@ import { DialogModule } from "primeng/dialog";
 import { InputNumberModule } from "primeng/inputnumber";
 import { InputTextModule } from "primeng/inputtext";
 import { TableModule } from "primeng/table";
-import type { Producto, Usuario } from "../../models/producto";
+import type { Producto, ProductoInput, Usuario } from "../../models/producto";
 import { AuthService } from "../../servicios/auth-servicio";
 import { AdminService } from "../../servicios/admin-service";
 import { ProductService } from "../../servicios/product-service";
@@ -45,12 +45,23 @@ export class AdminComponent implements OnInit {
   userDialog = false;
   userDeleteDialog = false;
 
-  // Formulario reactivo para administrar los campos del producto
+  private createSizeForm(talle = "", stock: number | null = 0) {
+    return new FormGroup({
+      talle: new FormControl(talle, { nonNullable: true, validators: [Validators.required] }),
+      stock: new FormControl<number | null>(stock, [Validators.required, Validators.min(0)]),
+    });
+  }
+
+  get sizeControls() {
+    return this.form.controls.talles.controls;
+  }
+
   readonly form = new FormGroup({
     nombre: new FormControl("", { nonNullable: true, validators: [Validators.required] }),
     descripcion: new FormControl("", { nonNullable: true }),
     precio: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
     imagen: new FormControl("", { nonNullable: true }),
+    talles: new FormArray([this.createSizeForm()]),
   });
 
   readonly userForm = new FormGroup({
@@ -106,6 +117,7 @@ export class AdminComponent implements OnInit {
   newProduct() { 
     this.editingId.set(null); 
     this.form.reset({ nombre: "", descripcion: "", precio: null, imagen: "" }); 
+    this.form.setControl("talles", new FormArray([this.createSizeForm()]));
     this.productDialog = true; 
   }
 
@@ -118,13 +130,31 @@ export class AdminComponent implements OnInit {
   // Abre el diálogo cargando los datos del producto seleccionado para editarlo
   edit(product: Producto) {
     this.editingId.set(product.id_producto ?? product.id ?? null);
-    this.form.reset({ 
+    const talles = product.talles ?? [{
+      id_producto: product.id_producto ?? product.id,
+      talle: product.talle ?? "Único",
+      stock: Number(product.stock ?? 0),
+    }];
+    this.form.reset({
       nombre: product.nombre, 
       descripcion: product.descripcion ?? "", 
       precio: Number(product.precio), 
       imagen: product.imagen ?? "" 
     });
+    this.form.setControl("talles", new FormArray(
+      talles.map((variante) => this.createSizeForm(variante.talle, Number(variante.stock)))
+    ));
     this.productDialog = true;
+  }
+
+  addSize() {
+    this.form.controls.talles.push(this.createSizeForm());
+  }
+
+  removeSize(index: number) {
+    if (this.sizeControls.length > 1) {
+      this.form.controls.talles.removeAt(index);
+    }
   }
 
   save() {
@@ -136,11 +166,15 @@ export class AdminComponent implements OnInit {
     this.saving.set(true);
     const id = this.editingId();
     const formValue = this.form.getRawValue();
-    const producto: Partial<Producto> = {
+    const producto: ProductoInput = {
       nombre: formValue.nombre,
       descripcion: formValue.descripcion,
       precio: formValue.precio!,
-      imagen: formValue.imagen
+      imagen: formValue.imagen,
+      talles: formValue.talles.map((variante) => ({
+        talle: variante.talle.trim(),
+        stock: variante.stock!,
+      })),
     };
     const request = id === null
       ? this.productService.crear(producto)
@@ -151,6 +185,7 @@ export class AdminComponent implements OnInit {
         this.saving.set(false);
         this.productDialog = false;
         this.form.reset({ nombre: "", descripcion: "", precio: null, imagen: "" });
+        this.form.setControl("talles", new FormArray([this.createSizeForm()]));
         this.messages.add({
           severity: "success",
           summary: id === null ? "Producto creado" : "Producto actualizado",
@@ -164,7 +199,7 @@ export class AdminComponent implements OnInit {
         this.messages.add({
           severity: "error",
           summary: "No se pudo guardar",
-          detail: "Revisá la conexión y tus permisos de administrador."
+          detail: this.apiError(error, "Revisá los datos, la conexión y tus permisos de administrador.")
         });
       }
     });

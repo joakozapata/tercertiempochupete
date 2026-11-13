@@ -18,4 +18,63 @@
       </p-card>
     }
   </div>
+
+  <section class="featured-section" aria-labelledby="featured-heading">
+    <div class="featured-heading">
+      <div>
+        <span>SELECCIÓN 3T</span>
+        <h2 id="featured-heading">Para completar tu equipo.</h2>
+      </div>
+      <p>Precios e inventario actualizados desde el catálogo. Elegí el talle disponible y sumalo al carrito.</p>
+    </div>
+
+    @if (loadingProducts()) {
+      <p class="featured-state">Cargando productos destacados...</p>
+    } @else if (recommendedProducts().length) {
+      <div class="featured-grid">
+        @for (product of recommendedProducts(); track product.id) {
+          <p-card styleClass="featured-card">
+            <ng-template #header>
+              <div class="featured-image">
+                <img [src]="imageFor(product)" [alt]="product.nombre" />
+                @if (!selectedVariant(product)) {
+                  <p-tag value="SIN STOCK" severity="danger" />
+                } @else {
+                  <p-tag value="DESTACADO" severity="success" />
+                }
+              </div>
+            </ng-template>
+            <div class="featured-name">{{ product.nombre }}</div>
+            <p class="featured-description">{{ product.descripcion || "Equipamiento deportivo Tercer Tiempo." }}</p>
+            <div class="featured-price">
+              {{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
+            </div>
+            <div class="featured-sizes">
+              <span>Talles · unidades</span>
+              <div class="size-options">
+                @for (variant of variantsFor(product); track variant.id_producto) {
+                  <button
+                    type="button"
+                    [disabled]="variant.stock <= 0"
+                    [class.selected]="selectedVariant(product)?.id_producto === variant.id_producto"
+                    (click)="selectVariant(product, variant)"
+                  >
+                    {{ variant.talle }} <small>{{ variant.stock }}</small>
+                  </button>
+                }
+              </div>
+            </div>
+            <p-button
+              [label]="selectedVariant(product) ? 'Agregar al carrito' : 'Sin stock disponible'"
+              icon="pi pi-shopping-bag"
+              [disabled]="!selectedVariant(product)"
+              (onClick)="addToCart(product)"
+            />
+          </p-card>
+        }
+      </div>
+    } @else {
+      <p class="featured-state">No hay productos disponibles para destacar en este momento.</p>
+    }
+  </section>
 </section>

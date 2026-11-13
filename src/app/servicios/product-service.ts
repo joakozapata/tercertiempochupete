@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
-import type { Producto } from "../models/producto"; // Asegúrate de que la ruta a la carpeta models sea correcta
+import type { Producto, ProductoInput } from "../models/producto";
 
 @Injectable({
   providedIn: "root",
@@ -25,12 +25,12 @@ listar(buscar: string = ""): Observable<Producto[]> {
   }
 
   // Crear producto (admin)
-  crear(producto: Partial<Producto>): Observable<any> {
+  crear(producto: ProductoInput): Observable<any> {
     return this.http.post(this.apiUrl, producto);
   }
 
   // Editar producto (admin)
-  editar(id: number, producto: Partial<Producto>): Observable<any> {
+  editar(id: number, producto: ProductoInput): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, producto);
   }
 
