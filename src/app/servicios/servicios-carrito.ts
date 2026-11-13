@@ -1,7 +1,15 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, switchMap, tap } from 'rxjs';
 import type { ItemCarrito, Producto } from '../models/producto';
+
+type CartResponse =
+  | ItemCarrito[]
+  | {
+      items?: ItemCarrito[];
+      carrito?: ItemCarrito[];
+      data?: ItemCarrito[] | { items?: ItemCarrito[]; carrito?: ItemCarrito[] };
+    };
 
 @Injectable({
   providedIn: 'root',
@@ -17,35 +25,48 @@ export class CarritoService {
   );
 
   load(): Observable<ItemCarrito[]> {
-    return this.http.get<any>(`${this.apiUrl}/carrito`).pipe(
-      tap((response: any) => {
-        const productos: ItemCarrito[] = Array.isArray(response)
-          ? response
-          : Array.isArray(response?.items)
-            ? response.items
-            : [];
-        this.items.set(productos);
-      })
+    return this.http.get<CartResponse>(`${this.apiUrl}/carrito`).pipe(
+      map((response) => {
+        if (Array.isArray(response)) {
+          return response;
+        }
+
+        const data = response.data;
+        if (Array.isArray(response.items)) {
+          return response.items;
+        }
+        if (Array.isArray(response.carrito)) {
+          return response.carrito;
+        }
+        if (Array.isArray(data)) {
+          return data;
+        }
+        return data?.items ?? data?.carrito ?? [];
+      }),
+      tap((items) => this.items.set(items))
     );
   }
 
-  add(producto: Producto): Observable<any> {
+  add(producto: Producto): Observable<unknown> {
     const idProducto = producto.id_producto ?? producto.id;
 
-    return this.http.post(`${this.apiUrl}/carrito/agregar`, { id_producto: idProducto }).pipe(
-      tap(() => this.load().subscribe())
+    return this.http.post<unknown>(`${this.apiUrl}/carrito/agregar`, {
+      id_producto: idProducto,
+      cantidad: 1,
+    }).pipe(
+      switchMap((response) => this.load().pipe(map(() => response)))
     );
   }
 
-  update(item: ItemCarrito, cantidad: number): Observable<any> {
+  update(item: ItemCarrito, cantidad: number): Observable<unknown> {
     const idProducto = item.id_producto ?? item.id;
 
-    return this.http.put(`${this.apiUrl}/carrito/actualizar/${idProducto}`, { cantidad }).pipe(
-      tap(() => this.load().subscribe())
+    return this.http.put<unknown>(`${this.apiUrl}/carrito/actualizar/${idProducto}`, { cantidad }).pipe(
+      switchMap((response) => this.load().pipe(map(() => response)))
     );
   }
 
-  remove(idProducto: number): Observable<any> {
+  remove(idProducto: number): Observable<unknown> {
     return this.http.delete(`${this.apiUrl}/carrito/eliminar/${idProducto}`).pipe(
       tap(() => {
         this.items.set(this.items().filter((item) => (item.id_producto ?? item.id) !== idProducto));
@@ -53,8 +74,8 @@ export class CarritoService {
     );
   }
 
-  clear(): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/carrito/limpiar`).pipe(
+  clear(): Observable<unknown> {
+    return this.http.delete(`${this.apiUrl}/carrito/vaciar`).pipe(
       tap(() => this.items.set([]))
     );
   }

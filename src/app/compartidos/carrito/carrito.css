@@ -181,6 +181,23 @@
   font-weight: 800;
 }
 
+.item-category {
+  display: block;
+  margin-bottom: 4px;
+  color: #31d09e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.item-description {
+  margin: 0 0 5px;
+  color: #85858c;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 .item-unit {
   color: #85858c;
   font-size: 11px;

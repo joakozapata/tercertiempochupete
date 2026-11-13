@@ -20,7 +20,7 @@
           </button>
         </div>
 
-        @for (item of cart.items(); track item.id_producto) {
+        @for (item of cart.items(); track item.id_producto ?? item.id) {
 
           <article class="cart-item">
 
@@ -30,6 +30,12 @@
 
             <div class="item-info">
               <h3>{{ name(item) }}</h3>
+              <span class="item-category">
+                {{ item.producto?.categoria || "Equipamiento deportivo" }}
+              </span>
+              <p class="item-description">
+                {{ item.producto?.descripcion || "Selección oficial Tercer Tiempo." }}
+              </p>
               <span class="item-unit">
                 {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }} c/u
               </span>

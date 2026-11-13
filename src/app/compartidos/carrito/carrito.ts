@@ -6,7 +6,9 @@ import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { ButtonModule } from "primeng/button";
 import { CardModule } from "primeng/card";
 import type { ItemCarrito } from "../../models/producto";
+import { ProductService } from "../../servicios/product-service";
 import { CarritoService } from "../../servicios/servicios-carrito";
+import { forkJoin, map, of, switchMap, type Observable } from "rxjs";
 
 @Component({
   selector: "app-carrito",
@@ -18,6 +20,7 @@ import { CarritoService } from "../../servicios/servicios-carrito";
 })
 export class CarritoComponent implements OnInit {
   readonly cart = inject(CarritoService);
+  private readonly products = inject(ProductService);
   private readonly confirmation = inject(ConfirmationService);
   private readonly messages = inject(MessageService);
   private readonly router = inject(Router);
@@ -27,10 +30,38 @@ export class CarritoComponent implements OnInit {
     "https://images.unsplash.com/photo-1515555230216-82228b88ea98?w=300&h=300&fit=crop&auto=format";
 
   ngOnInit() {
-    // Suscribirse a la carga del carrito desde la API
-    this.cart.load().subscribe({
-      error: (err) => console.error("Error al cargar carrito", err)
+    this.cart.load().pipe(
+      switchMap((items) =>
+        items.length
+          ? forkJoin(items.map((item) => this.loadProduct(item)))
+          : of(items)
+      )
+    ).subscribe({
+      next: (items) => this.cart.items.set(items),
+      error: (err) => console.error("Error al cargar los productos del carrito", err)
     });
+  }
+
+  private loadProduct(item: ItemCarrito): Observable<ItemCarrito> {
+    if (item.producto) {
+      return of({
+        ...item,
+        nombre: item.nombre ?? item.producto.nombre,
+        imagen: item.imagen ?? item.producto.imagen,
+        precio_unitario: item.precio_unitario ?? item.producto.precio,
+      });
+    }
+
+    const idProducto = item.id_producto ?? item.id;
+    return this.products.verUno(idProducto).pipe(
+      map((producto) => ({
+        ...item,
+        producto,
+        nombre: item.nombre ?? producto.nombre,
+        imagen: item.imagen ?? producto.imagen,
+        precio_unitario: item.precio_unitario ?? producto.precio,
+      }))
+    );
   }
 
   name(item: ItemCarrito) {
@@ -40,8 +71,12 @@ export class CarritoComponent implements OnInit {
   image(item: ItemCarrito) {
     const img = item.producto?.imagen || item.imagen;
     if (!img) return this.fallback;
-    if (img.startsWith("http")) return img;
-   return `http://localhost/API_TercerTiempo/uploads/${img}`;
+    if (/^https?:\/\//i.test(img)) return img;
+    const imagePath = img
+      .replace(/^\/+/, "")
+      .replace(/^public\/uploads\//i, "")
+      .replace(/^uploads\//i, "");
+    return `http://localhost/API_TercerTiempo/public/uploads/${imagePath}`;
   }
 
   increase(item: ItemCarrito) {
@@ -61,7 +96,7 @@ export class CarritoComponent implements OnInit {
   }
 
   remove(item: ItemCarrito) {
-    this.cart.remove(item.id_producto).subscribe({
+    this.cart.remove(item.id_producto ?? item.id).subscribe({
       next: () => {
         this.messages.add({
           severity: "success",
