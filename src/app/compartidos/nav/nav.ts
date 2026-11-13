@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from "@angular/core";
+import { Component, DestroyRef, computed, inject } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { NavigationEnd, Router, RouterLink } from "@angular/router";
 import { filter } from "rxjs";
@@ -29,7 +29,7 @@ export class NavComponent {
     { label: "Contacto", icon: "pi pi-envelope", routerLink: ["/contacto"] },
   ];
 
-  readonly isLoggedIn = signal(false);
+  readonly isLoggedIn = computed(() => this.auth.isAuthenticated());
   readonly nombreUsuario = computed(() => this.auth.user()?.nombre ?? "");
   readonly cantidadItems = computed(() => this.cart.count());
   private profileRequestedFor: string | null = null;
@@ -47,13 +47,11 @@ export class NavComponent {
   logout(): void {
     this.auth.logout();
     this.profileRequestedFor = null;
-    this.isLoggedIn.set(false);
     void this.router.navigate(["/inicio"]);
   }
 
   private refreshSession(): void {
     const token = this.auth.getToken();
-    this.isLoggedIn.set(!!token);
 
     if (!token || this.auth.user() || this.profileRequestedFor === token) {
       return;

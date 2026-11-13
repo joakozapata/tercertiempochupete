@@ -2,7 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -57,19 +57,28 @@ export class RegistroComponent {
     }
 
     this.loading.set(true);
-    const formData = this.form.value;
+    const formData = this.form.getRawValue();
+    const payload = {
+      nombre: formData.nombre.trim(),
+      email: formData.email.trim().toLowerCase(),
+      password: formData.password
+    };
 
-    // Petición POST a tu API de PHP para registrar el usuario
-    this.http.post<any>(`${this.apiUrl}/auth/registro`, formData).subscribe({
-      next: (response) => {
+    this.http.post<{ mensaje?: string }>(`${this.apiUrl}/usuarios/registro`, payload).subscribe({
+      next: () => {
         this.loading.set(false);
         alert('¡Cuenta creada con éxito! Por favor, inicia sesión.');
-        this.router.navigate(['/inicioSesion']);
+        void this.router.navigate(['/inicioSesion']);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Error al registrar usuario:', err);
         this.loading.set(false);
-        alert('Hubo un error al registrar la cuenta. Es posible que el correo ya esté en uso.');
+        const apiError = typeof err.error?.error === 'string' ? err.error.error : null;
+        const message = apiError
+          ?? (err.status === 0
+            ? 'No se pudo conectar con la API. Verificá que el servidor esté activo.'
+            : 'No se pudo crear la cuenta. Intentá nuevamente.');
+        alert(message);
       }
     });
   }

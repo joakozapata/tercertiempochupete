@@ -2,10 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { AuthService } from '../../servicios/auth-servicio';
 
 @Component({
   selector: 'app-inicio-sesion',
@@ -23,10 +24,8 @@ import { InputTextModule } from 'primeng/inputtext';
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-
-  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public';
 
   // Señal para manejar el estado de carga del botón
   readonly loading = signal<boolean>(false);
@@ -44,31 +43,26 @@ export class LoginComponent {
     }
 
     this.loading.set(true);
-    const credentials = this.form.value;
+    const credentials = this.form.getRawValue();
 
-    // Petición POST a tu API de PHP (ajusta la ruta del endpoint si difiere en tu backend, ej: /auth/login)
- this.http.post<any>(`${this.apiUrl}/usuarios/login`, credentials).subscribe({
-      next: (response) => {
+    this.auth.login({
+      email: credentials.email,
+      password: credentials.clave
+    }).subscribe({
+      next: () => {
         this.loading.set(false);
-
-        // Extrae el token y el rol de la respuesta del backend
-        const token = response.token || response.access_token;
-        const rol = response.rol || response.user?.rol || 'cliente';
-
-        if (token) {
-          localStorage.setItem('token', token);
-          localStorage.setItem('rol', rol);
-
-          // Redirige al catálogo o a la página principal tras iniciar sesión con éxito
-          this.router.navigate(['/productos']);
-        } else {
-          alert('No se pudo autenticar correctamente.');
-        }
+        void this.router.navigate(['/productos']);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         console.error('Error al iniciar sesión:', err);
+        this.auth.logout();
         this.loading.set(false);
-        alert('Credenciales incorrectas o error de conexión con la API.');
+        const message = err.status === 401
+          ? 'Correo o contraseña incorrectos.'
+          : err.status === 0
+            ? 'No se pudo conectar con la API. Verificá que el servidor esté activo.'
+            : 'No se pudo iniciar sesión. Intentá nuevamente.';
+        alert(message);
       }
     });
   }

@@ -51,17 +51,18 @@ export class AuthService {
     return this.user()?.nombre ?? "";
   }
 
-login(credentials: { email: string; clave?: string; password?: string }): Observable<any> {
-    const passwordAEnviar = credentials.clave ?? credentials.password ?? "";
+login(credentials: { email: string; clave?: string; password?: string }): Observable<{ token: string; usuario: Usuario }> {
+    const passwordAEnviar = credentials.password ?? credentials.clave ?? "";
     return this.http
-      .post<{ token: string; usuario: Usuario }>(`${this.apiUrl}/login`, {
-        email: credentials.email,
-        contraseña: passwordAEnviar,
+      .post<{ token: string; usuario: Usuario }>(`${this.apiUrl}/usuarios/login`, {
+        email: credentials.email.trim().toLowerCase(),
+        password: passwordAEnviar,
       })
       .pipe(
         tap((res) => {
           localStorage.setItem("token", res.token);
           localStorage.setItem("usuario", JSON.stringify(res.usuario));
+          localStorage.setItem("rol", res.usuario.rol);
           this.user.set(res.usuario);
         })
       );
@@ -82,7 +83,7 @@ login(credentials: { email: string; clave?: string; password?: string }): Observ
   }
 
   loadProfile(): Observable<Usuario> {
-    return this.http.get<Usuario>(this.apiUrl).pipe(
+    return this.http.get<Usuario>(`${this.apiUrl}/usuarios`).pipe(
       tap((usuario) => {
         localStorage.setItem("usuario", JSON.stringify(usuario));
         this.user.set(usuario);
@@ -93,6 +94,7 @@ login(credentials: { email: string; clave?: string; password?: string }): Observ
   logout(): void {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
+    localStorage.removeItem("rol");
     this.user.set(null);
   }
 }
