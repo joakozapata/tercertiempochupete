@@ -8,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
 import { SkeletonModule } from 'primeng/skeleton';
 import { DialogModule } from 'primeng/dialog';
+import { MessageService } from 'primeng/api';
 import { ProductService } from '../../servicios/product-service';
 import { CarritoService } from '../../servicios/servicios-carrito';
 import { FavoritoService } from '../../servicios/servicios-favorito';
@@ -33,6 +34,7 @@ export class ProductosComponent implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly carritoService = inject(CarritoService);
   private readonly favoritoService = inject(FavoritoService);
+  private readonly messages = inject(MessageService);
 
   // Estados reactivos con Signals
   readonly products = signal<Producto[]>([]);
@@ -82,11 +84,19 @@ export class ProductosComponent implements OnInit {
 
   addToCart(product: Producto) {
     this.carritoService.add(product).subscribe({
-      next: (res) => {
-        console.log('Producto agregado al carrito con éxito', res);
-        // Opcional: Aquí puedes disparar una alerta o actualizar un contador si lo manejas en el servicio
-      },
-      error: (err) => console.error('Error al agregar al carrito:', err)
+      next: () => this.messages.add({
+        severity: 'success',
+        summary: 'Producto agregado',
+        detail: 'El producto se agregó correctamente al carrito.'
+      }),
+      error: (err) => {
+        console.error('Error al agregar al carrito:', err);
+        this.messages.add({
+          severity: 'error',
+          summary: 'No se pudo agregar',
+          detail: 'No se pudo agregar el producto al carrito. Intentá nuevamente.'
+        });
+      }
     });
   }
 

@@ -1,76 +1,181 @@
-<div class="container mx-auto p-4">
-  <h2 class="text-2xl font-bold mb-4">Finalizar Compra</h2>
+<section class="checkout-page">
+  <header class="checkout-heading">
+    <span>ÚLTIMO PASO</span>
+    <h1>Finalizar compra</h1>
+    <p>Completá tus datos para preparar el envío.</p>
+  </header>
 
-  @if (carritoService.items().length === 0) {
-    <div class="text-center p-6 border rounded shadow-sm bg-white">
-      <i class="pi pi-shopping-cart text-5xl text-gray-400 mb-3"></i>
-      <p class="text-lg">No hay productos en tu carrito para procesar una compra.</p>
-      <p-button label="Ir al catálogo de botines" icon="pi pi-arrow-left" routerLink="/productos" class="mt-3"></p-button>
+  @if (loadingCart()) {
+    <div class="checkout-state">
+      <i class="pi pi-spin pi-spinner"></i>
+      <p>Cargando tu carrito...</p>
+    </div>
+  } @else if (receipt(); as order) {
+    <section class="receipt print-receipt">
+      <header class="receipt-heading">
+        <span class="receipt-brand">TERCER TIEMPO</span>
+        <h2>Compra confirmada</h2>
+        <p>Comprobante #{{ order.idCompra ?? "—" }}</p>
+        <small>{{ order.fecha | date:"dd/MM/yyyy HH:mm" }}</small>
+      </header>
+
+      <div class="receipt-details">
+        <section>
+          <h3>Datos de envío</h3>
+          <p>{{ order.datosEnvio.direccion }}</p>
+          <p>{{ order.datosEnvio.ciudad }} {{ order.datosEnvio.codigoPostal }}</p>
+          <p>Teléfono: {{ order.datosEnvio.telefono }}</p>
+        </section>
+
+        <section class="receipt-products">
+          <h3>Resumen del pedido</h3>
+          @for (item of order.items; track item.id_producto ?? item.id) {
+            <div class="receipt-item">
+              <div>
+                <strong>{{ nombreProducto(item) }}</strong>
+                <span>{{ item.cantidad }} x {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }}</span>
+              </div>
+              <strong>{{ item.cantidad * item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }}</strong>
+            </div>
+          }
+          <div class="receipt-total">
+            <span>Total</span>
+            <strong>{{ order.total | currency:"ARS":"symbol-narrow":"1.0-0" }}</strong>
+          </div>
+        </section>
+      </div>
+
+      <div class="receipt-actions no-print">
+        <p-button
+          label="Imprimir comprobante"
+          icon="pi pi-print"
+          styleClass="checkout-primary"
+          (onClick)="imprimir()"
+        />
+        <a routerLink="/productos" class="checkout-secondary">Seguir comprando</a>
+      </div>
+    </section>
+  } @else if (carritoService.items().length === 0) {
+    <div class="checkout-state">
+      <i class="pi pi-shopping-bag"></i>
+      <h2>Tu carrito está vacío</h2>
+      <p>Agregá productos antes de finalizar la compra.</p>
+      <a routerLink="/productos" class="checkout-primary link-button">Explorar productos</a>
     </div>
   } @else {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      
-      <!-- Formulario de Envío -->
-      <div class="md:col-span-2">
-        <p-card header="Datos de Envío y Contacto">
-          <form (ngSubmit)="finalizarPedido()" class="flex flex-col gap-4">
-            <div class="flex flex-col gap-2">
-              <label for="direccion" class="font-semibold">Dirección de entrega *</label>
-              <input id="direccion" type="text" pInputText [(ngModel)]="datosEnvio.direccion" name="direccion" placeholder="Ej: Calle 123 N° 456" required />
-            </div>
+    <form #checkoutForm="ngForm" (ngSubmit)="finalizarPedido(checkoutForm)" class="checkout-form">
+      <div class="checkout-layout">
+        <p-card styleClass="checkout-card shipping-card">
+          <ng-template #title>Datos de envío y contacto</ng-template>
+          <ng-template #subtitle>Los campos con * son obligatorios.</ng-template>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="flex flex-col gap-2">
-                <label for="ciudad" class="font-semibold">Ciudad / Localidad *</label>
-                <input id="ciudad" type="text" pInputText [(ngModel)]="datosEnvio.ciudad" name="ciudad" placeholder="Ej: Cipolletti" required />
-              </div>
-
-              <div class="flex flex-col gap-2">
-                <label for="cp" class="font-semibold">Código Postal</label>
-                <input id="cp" type="text" pInputText [(ngModel)]="datosEnvio.codigoPostal" name="codigoPostal" placeholder="Ej: 8324" />
-              </div>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <label for="telefono" class="font-semibold">Teléfono de contacto *</label>
-              <input id="telefono" type="text" pInputText [(ngModel)]="datosEnvio.telefono" name="telefono" placeholder="Ej: 2991234567" required />
-            </div>
-          </form>
-        </p-card>
-      </div>
-
-      <!-- Resumen del Pedido -->
-      <div class="md:col-span-1">
-        <p-card header="Resumen del Pedido">
-          <div class="flex flex-col gap-3">
-            @for (item of carritoService.items(); track item.id_producto) {
-              <div class="flex justify-content-between align-items-center border-b pb-2">
-                <div>
-                  <span class="font-bold">{{ item.nombre }}</span>
-                  <p class="text-sm text-gray-500">Cant: {{ item.cantidad }} x {{ item.precio_unitario | currency }}</p>
-                </div>
-                <span class="font-bold">{{ (item.precio_unitario * item.cantidad) | currency }}</span>
-              </div>
+          <div class="field">
+            <label for="direccion">Dirección de entrega *</label>
+            <input
+              id="direccion"
+              name="direccion"
+              type="text"
+              pInputText
+              [(ngModel)]="datosEnvio.direccion"
+              #direccion="ngModel"
+              placeholder="Ej.: Calle 123 N.º 456"
+              autocomplete="street-address"
+              required
+            />
+            @if (direccion.invalid && direccion.touched) {
+              <small>Ingresá una dirección de entrega.</small>
             }
+          </div>
 
-            <hr />
-
-            <div class="flex justify-content-between items-center text-xl font-bold mt-2">
-              <span>Total:</span>
-              <span class="text-primary">{{ carritoService.total() | currency }}</span>
+          <div class="field-row">
+            <div class="field">
+              <label for="ciudad">Ciudad / localidad *</label>
+              <input
+                id="ciudad"
+                name="ciudad"
+                type="text"
+                pInputText
+                [(ngModel)]="datosEnvio.ciudad"
+                #ciudad="ngModel"
+                placeholder="Ej.: Cipolletti"
+                autocomplete="address-level2"
+                required
+              />
+              @if (ciudad.invalid && ciudad.touched) {
+                <small>Ingresá tu ciudad o localidad.</small>
+              }
             </div>
 
-            <p-button 
-              label="Confirmar y Pagar" 
-              icon="pi pi-check" 
-              styleClass="w-full mt-4" 
-              [loading]="loading()"
-              (onClick)="finalizarPedido()">
-            </p-button>
+            <div class="field">
+              <label for="codigoPostal">Código postal</label>
+              <input
+                id="codigoPostal"
+                name="codigoPostal"
+                type="text"
+                pInputText
+                [(ngModel)]="datosEnvio.codigoPostal"
+                placeholder="Ej.: 8324"
+                autocomplete="postal-code"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="telefono">Teléfono de contacto *</label>
+            <input
+              id="telefono"
+              name="telefono"
+              type="tel"
+              pInputText
+              [(ngModel)]="datosEnvio.telefono"
+              #telefono="ngModel"
+              placeholder="Ej.: 2991234567"
+              autocomplete="tel"
+              minlength="8"
+              pattern="[0-9+() -]{8,20}"
+              required
+            />
+            @if (telefono.invalid && telefono.touched) {
+              <small>Ingresá un teléfono válido (8 a 20 caracteres).</small>
+            }
           </div>
         </p-card>
-      </div>
 
-    </div>
+        <aside class="order-summary">
+          <div class="summary-heading">
+            <span>RESUMEN</span>
+            <h2>Tu pedido</h2>
+          </div>
+
+          @for (item of carritoService.items(); track item.id_producto ?? item.id) {
+            <div class="summary-item">
+              <div>
+                <strong>{{ nombreProducto(item) }}</strong>
+                <span>Cant. {{ item.cantidad }} · {{ item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }} c/u</span>
+              </div>
+              <strong>{{ item.cantidad * item.precio_unitario | currency:"ARS":"symbol-narrow":"1.0-0" }}</strong>
+            </div>
+          }
+
+          <div class="summary-shipping">
+            <span>Envío</span>
+            <strong>Gratis</strong>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <strong>{{ carritoService.total() | currency:"ARS":"symbol-narrow":"1.0-0" }}</strong>
+          </div>
+
+          <p-button
+            type="submit"
+            label="Confirmar y pagar"
+            icon="pi pi-check"
+            styleClass="checkout-primary"
+            [disabled]="checkoutForm.invalid || loading()"
+            [loading]="loading()"
+          />
+        </aside>
+      </div>
+    </form>
   }
-</div>
+</section>

@@ -1,72 +1,123 @@
-import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { CarritoService } from '../../servicios/servicios-carrito';
+import { Component, inject, OnInit, signal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, NgForm } from "@angular/forms";
+import { RouterLink } from "@angular/router";
+import { HttpClient } from "@angular/common/http";
+import { MessageService } from "primeng/api";
+import { CardModule } from "primeng/card";
+import { ButtonModule } from "primeng/button";
+import { InputTextModule } from "primeng/inputtext";
+import type { ItemCarrito } from "../../models/producto";
+import { CarritoService } from "../../servicios/servicios-carrito";
+
+interface CompraResponse {
+  id_compra?: number | string;
+  mensaje?: string;
+}
+
+interface ComprobanteCompra {
+  idCompra: number | string | null;
+  fecha: Date;
+  datosEnvio: {
+    direccion: string;
+    ciudad: string;
+    codigoPostal: string;
+    telefono: string;
+  };
+  items: ItemCarrito[];
+  total: number;
+}
 
 @Component({
-  selector: 'app-compra',
+  selector: "app-compra",
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterLink,
-    CardModule,
-    ButtonModule,
-    InputTextModule
-  ],
-  templateUrl: './compra.html', // O puedes usar tu template inline si lo prefieres
-  styleUrl: './compra.css'
+  imports: [CommonModule, FormsModule, RouterLink, CardModule, ButtonModule, InputTextModule],
+  templateUrl: "./compra.html",
+  styleUrl: "./compra.css",
 })
-export class CompraComponent {
+export class CompraComponent implements OnInit {
   readonly carritoService = inject(CarritoService);
   private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
+  private readonly messages = inject(MessageService);
 
-  readonly loading = signal<boolean>(false);
-  private readonly apiUrl = 'http://localhost/API_TercerTiempo/public';
+  readonly loading = signal(false);
+  readonly loadingCart = signal(true);
+  readonly receipt = signal<ComprobanteCompra | null>(null);
+  private readonly apiUrl = "http://localhost/API_TercerTiempo/public";
 
-  // Objeto enlazado con [(ngModel)] en tu HTML
-  datosEnvio = {
-    direccion: '',
-    ciudad: '',
-    codigoPostal: '',
-    telefono: ''
+  readonly datosEnvio = {
+    direccion: "",
+    ciudad: "",
+    codigoPostal: "",
+    telefono: "",
   };
 
-  finalizarPedido() {
-    // Validar campos obligatorios básicos antes de enviar
-    if (!this.datosEnvio.direccion || !this.datosEnvio.ciudad || !this.datosEnvio.telefono) {
-      alert('Por favor, completa los campos obligatorios de envío y contacto.');
+  ngOnInit(): void {
+    this.carritoService.load().subscribe({
+      next: () => this.loadingCart.set(false),
+      error: (error) => {
+        console.error("No se pudo cargar el carrito para finalizar la compra:", error);
+        this.loadingCart.set(false);
+        this.messages.add({
+          severity: "error",
+          summary: "No se pudo cargar el carrito",
+          detail: "Volvé al carrito e intentá nuevamente.",
+        });
+      },
+    });
+  }
+
+  finalizarPedido(form: NgForm): void {
+    if (form.invalid || this.loading()) {
+      form.control.markAllAsTouched();
+      return;
+    }
+
+    const items = this.carritoService.items().map((item) => ({ ...item }));
+    if (items.length === 0) {
+      this.messages.add({
+        severity: "warn",
+        summary: "Carrito vacío",
+        detail: "Agregá productos antes de confirmar la compra.",
+      });
       return;
     }
 
     this.loading.set(true);
-
-    const payload = {
-      ...this.datosEnvio,
-      items: this.carritoService.items(),
-      total: this.carritoService.total()
-    };
-
-    // Envío del pedido a tu API PHP
-    this.http.post(`${this.apiUrl}/pedidos/crear`, payload).subscribe({
-      next: () => {
+    this.http.post<CompraResponse>(`${this.apiUrl}/compras/finalizar`, this.datosEnvio).subscribe({
+      next: (response) => {
+        this.receipt.set({
+          idCompra: response.id_compra ?? null,
+          fecha: new Date(),
+          datosEnvio: { ...this.datosEnvio },
+          items,
+          total: items.reduce((sum, item) => sum + item.precio_unitario * item.cantidad, 0),
+        });
+        this.carritoService.items.set([]);
         this.loading.set(false);
-        // Limpiamos el carrito localmente tras el éxito
-        this.carritoService.clear().subscribe();
-        // Redirigimos al historial o a una vista de confirmación
-        this.router.navigate(['/mis-compras']);
+        this.messages.add({
+          severity: "success",
+          summary: "Compra confirmada",
+          detail: "Tu comprobante está listo para imprimir.",
+        });
       },
-      error: (err) => {
-        console.error('Error al procesar el pedido:', err);
+      error: (error) => {
+        console.error("Error al procesar la compra:", error);
         this.loading.set(false);
-        alert('Hubo un error al registrar tu compra. Inténtalo nuevamente.');
-      }
+        this.messages.add({
+          severity: "error",
+          summary: "No se pudo finalizar la compra",
+          detail: "Revisá tu carrito e intentá nuevamente.",
+        });
+      },
     });
+  }
+
+  nombreProducto(item: ItemCarrito): string {
+    return item.producto?.nombre ?? item.nombre ?? `Producto ${item.id_producto ?? item.id}`;
+  }
+
+  imprimir(): void {
+    window.print();
   }
 }

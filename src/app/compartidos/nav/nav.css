@@ -95,7 +95,63 @@
 .nav-actions {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.nav-cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid #38383d;
+  border-radius: 6px;
+  color: #eeeeee !important;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.nav-cart:hover {
+  background: #232326;
+  border-color: #31d09e;
+  color: #31d09e !important;
+}
+
+.cart-icon {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.nav-user {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-left: 1px solid #38383d;
+  border-right: 1px solid #38383d;
+  color: #eeeeee;
+  white-space: nowrap;
+}
+
+.account-label {
+  color: #a0a0a5;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.account-name {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 :host ::ng-deep .btn-emerald {
@@ -122,6 +178,20 @@
   font-size: 12px !important;
 }
 
+:host ::ng-deep .nav-logout {
+  min-height: 36px;
+  padding: 6px 12px !important;
+  border: 1px solid #5b3030 !important;
+  border-radius: 6px !important;
+  background: #251819 !important;
+  color: #ff8585 !important;
+}
+
+:host ::ng-deep .nav-logout:hover {
+  border-color: #ff6262 !important;
+  background: #3a1c1e !important;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   :host ::ng-deep .store-menubar {
@@ -134,7 +204,7 @@
   }
 
   .nav-actions {
-    gap: 4px;
+    gap: 6px;
   }
 }
 .brand-text {
@@ -152,31 +222,6 @@
 .brand-text {
   font-family: 'Barlow Condensed', sans-serif !important;
 }
-:host ::ng-deep .nav-cart {
-  color: #eeeeee !important;
-}
-
-:host ::ng-deep .nav-cart:hover {
-  color: #31d09e !important;
-}
-
-:host ::ng-deep .nav-cart .p-badge {
-  background: #31d09e;
-  color: #080808;
-  font-weight: 800;
-  font-size: 10px;
-  min-width: 16px;
-  height: 16px;
-  line-height: 16px;
-}
-:host ::ng-deep .nav-cart {
-  color: #eeeeee !important;
-}
-
-:host ::ng-deep .nav-cart:hover {
-  color: #31d09e !important;
-}
-
 :host ::ng-deep .nav-cart .p-badge {
   background: #31d09e;
   color: #080808;

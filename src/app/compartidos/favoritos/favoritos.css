@@ -1,122 +1,231 @@
-/* ==========================================
-   ESTILOS DE LA VISTA DE FAVORITOS
-   ========================================== */
+:host {
+  display: block;
+  width: 100%;
+  background: #080808;
+}
+
 .page {
-  padding: 1rem 0;
+  width: 100%;
+  max-width: 1184px;
+  min-height: 650px;
+  margin: 0 auto;
+  padding: 65px 0 85px;
+  box-sizing: border-box;
 }
 
-/* Cabecera de la página de favoritos */
-.page .page-heading {
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #1e293b;
-  padding-bottom: 1rem;
+.page-heading {
+  margin-bottom: 30px;
 }
 
-.page .page-heading span {
-  color: #facc15; /* Amarillo destacado */
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.page .page-heading div {
-  font-size: 2.25rem;
+.page-heading > span {
+  color: #31d09e;
+  font-size: 11px;
   font-weight: 800;
-  color: #f8fafc;
-  margin-top: 0.25rem;
+  letter-spacing: 1.5px;
 }
 
-.page .page-heading p {
-  color: #94a3b8;
-  margin-top: 0.5rem;
+.page-heading > div {
+  margin-top: 8px;
+  color: #f5f5f5;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 900;
+  line-height: 1;
 }
 
-/* Grid de tarjetas de favoritos */
+.page-heading p {
+  margin: 10px 0 0;
+  color: #85858c;
+  font-size: 12px;
+}
+
 .favorites-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
 }
 
-/* Estilo para las tarjetas (p-card) */
-.favorites-grid p-card {
-  background-color: #121824 !important;
-  border: 1px solid #1e293b !important;
-  border-radius: 12px !important;
+:host ::ng-deep .product-card {
+  height: 100%;
   overflow: hidden;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: #18181b !important;
+  border: 1px solid #26262a !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
+}
+
+:host ::ng-deep .product-card:hover {
+  transform: translateY(-4px);
+  border-color: #31d09e !important;
+  background: #1c1c20 !important;
+}
+
+:host ::ng-deep .product-card .p-card-body {
+  height: 100%;
+  padding: 15px !important;
   display: flex;
   flex-direction: column;
 }
 
-.favorites-grid p-card:hover {
-  transform: translateY(-4px);
-  border-color: #2563eb; /* Azul principal al pasar el cursor */
-}
-
-/* Imagen del producto en la tarjeta */
-.favorites-grid p-card img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-bottom: 1px solid #1e293b;
-}
-
-/* Textos de la tarjeta (PrimeNG slots) */
-.favorites-grid .p-card-title {
-  color: #f8fafc !important;
-  font-size: 1.15rem !important;
-  font-weight: 700 !important;
-  padding: 1rem 1rem 0.25rem 1rem !important;
-}
-
-.favorites-grid .p-card-subtitle {
-  color: #facc15 !important; /* El precio resalta en amarillo */
-  font-size: 1.1rem !important;
-  font-weight: 600 !important;
-  padding: 0 1rem 1rem 1rem !important;
-}
-
-.favorites-grid .p-card-footer {
-  padding: 0 1rem 1rem 1rem !important;
-}
-
-/* Acciones (Botones dentro de la tarjeta) */
-.actions {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.actions .p-button {
+:host ::ng-deep .product-card .p-card-content {
   flex: 1;
+  padding: 0 !important;
 }
 
-/* Estado vacío de favoritos */
+:host ::ng-deep .product-card .p-card-title {
+  margin-bottom: 5px !important;
+}
+
+:host ::ng-deep .product-card .p-card-subtitle {
+  margin-bottom: 10px !important;
+}
+
+.product-media {
+  position: relative;
+  width: 100%;
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #101012;
+}
+
+.product-media img {
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+
+:host ::ng-deep .product-card:hover .product-media img {
+  transform: scale(1.05);
+}
+
+.product-media p-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.product-name {
+  color: #f5f5f5;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.product-category {
+  color: #31d09e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.description {
+  min-height: 35px;
+  margin: 0 0 15px;
+  color: #85858c;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.price {
+  margin-bottom: 12px;
+  color: #31d09e;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-cart-button {
+  flex: 1;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #31d09e !important;
+  border: 1px solid #31d09e !important;
+  border-radius: 5px !important;
+  color: #080808 !important;
+  cursor: pointer;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+}
+
+.add-cart-button:hover:not(:disabled) {
+  background: #25b989 !important;
+  border-color: #25b989 !important;
+}
+
+.add-cart-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+:host ::ng-deep .remove-favorite-button {
+  width: 38px;
+  flex: 0 0 38px;
+}
+
 .empty {
-  text-align: center;
-  padding: 4rem 1rem;
-  background: #121824;
-  border-radius: 16px;
-  border: 1px dashed #1e293b;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin-top: 2rem;
+  padding: 30px;
+  text-align: center;
+  background: #18181b;
+  border: 1px solid #29292d;
+  border-radius: 10px;
 }
 
 .empty i {
-  font-size: 3.5rem;
-  color: #facc15; /* Icono de corazón en amarillo */
-  margin-bottom: 1rem;
+  margin-bottom: 18px;
+  color: #31d09e;
+  font-size: 35px;
 }
 
 .empty div {
-  font-size: 1.35rem;
-  font-weight: bold;
-  color: #f8fafc;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
+  color: #f5f5f5;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 30px;
+  font-weight: 900;
 }
 
 .empty p {
-  color: #94a3b8;
   margin-bottom: 1.5rem;
+  color: #85858c;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .favorites-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 40px 16px 60px;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
 }

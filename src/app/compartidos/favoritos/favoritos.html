@@ -8,20 +8,51 @@
   @if (favorites().length) {
     <div class="favorites-grid">
       @for (product of favorites(); track product.id) {
-        <p-card>
+        <p-card styleClass="product-card">
           <ng-template #header>
-            <img [src]="product.imagen || fallback" [alt]="product.nombre" />
-          </ng-template>
-          <ng-template #title>{{ product.nombre }}</ng-template>
-          <ng-template #subtitle>
-            {{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
-          </ng-template>
-          <ng-template #footer>
-            <div class="actions">
-              <p-button label="Agregar al carrito" icon="pi pi-shopping-bag" (onClick)="addToCart(product)" />
-              <p-button icon="pi pi-trash" severity="danger" [outlined]="true" [ariaLabel]="'Quitar ' + product.nombre" (onClick)="remove(product)" />
+            <div class="product-media">
+              <img [src]="image(product)" [alt]="product.nombre" />
+              @if (product.stock === 0) {
+                <p-tag value="SIN STOCK" severity="danger" />
+              }
             </div>
           </ng-template>
+
+          <ng-template #title>
+            <span class="product-name">{{ product.nombre }}</span>
+          </ng-template>
+          <ng-template #subtitle>
+            <span class="product-category">
+              {{ product.categoria || "Equipamiento deportivo" }}
+            </span>
+          </ng-template>
+
+          <p class="description">
+            {{ product.descripcion || "Selección oficial Tercer Tiempo." }}
+          </p>
+          <div class="price">
+            {{ product.precio | currency:"ARS":"symbol-narrow":"1.0-0" }}
+          </div>
+
+          <div class="card-actions">
+            <button
+              type="button"
+              class="add-cart-button"
+              [disabled]="product.stock === 0"
+              (click)="addToCart(product)"
+            >
+              <i class="pi pi-shopping-bag"></i>
+              Agregar al carrito
+            </button>
+            <p-button
+              icon="pi pi-heart-fill"
+              severity="danger"
+              [outlined]="true"
+              styleClass="remove-favorite-button"
+              [ariaLabel]="'Quitar ' + product.nombre + ' de favoritos'"
+              (onClick)="remove(product)"
+            />
+          </div>
         </p-card>
       }
     </div>

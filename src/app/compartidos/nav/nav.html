@@ -9,8 +9,12 @@
   <ng-template #end>
     <div class="nav-actions">
       <a routerLink="/carrito" class="nav-cart" title="Ver carrito">
-        <i class="pi pi-shopping-cart"></i>
-        Carrito
+        <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 1.9-1.4L22 8H6" />
+          <circle cx="10" cy="20" r="1.4" />
+          <circle cx="18" cy="20" r="1.4" />
+        </svg>
+        <span>Carrito</span>
         @if (cantidadItems() > 0) {
           <p-badge [value]="cantidadItems().toString()" />
         }
@@ -18,12 +22,13 @@
 
       @if (isLoggedIn()) {
         <span class="nav-user">
-          <i class="pi pi-user"></i>
-          {{ nombreUsuario() || "Mi cuenta" }}
+          <span class="account-label">Mi cuenta</span>
+          @if (nombreUsuario()) {
+            <span class="account-name">{{ nombreUsuario() }}</span>
+          }
         </span>
         <p-button
           label="Salir"
-          icon="pi pi-sign-out"
           styleClass="nav-logout"
           (onClick)="logout()"
         />
